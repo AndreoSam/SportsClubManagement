@@ -247,7 +247,10 @@ export default function RegistrationForm() {
       setOtpSent(true);
       toast.success("OTP Sent");
     } catch (err) {
-      console.log(err);
+      console.error("Error:", err);
+      if (err.response?.data?.logs) {
+        err.response.data.logs.forEach((log) => console.error("[Backend Error]", log));
+      }
 
       if (err.code === "ECONNABORTED") {
         toast.error("Request timeout. Check your internet or API URL.");
