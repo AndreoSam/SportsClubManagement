@@ -142,6 +142,27 @@ export default function AthleteDetail() {
           </div>
         </div>
 
+        {/* Rejection Reason - Only show if rejected */}
+        {athlete.status === "Rejected" && athlete.rejectionReason && (
+          <div className="rejection-section">
+            <div className="rejection-header">
+              <span className="rejection-icon">⚠️</span>
+              <h3 className="rejection-title">Rejection Reason</h3>
+            </div>
+            <div className="rejection-content">
+              <p className="rejection-text">{athlete.rejectionReason}</p>
+              <div className="rejection-meta">
+                <span className="meta-item">
+                  📅 {formatDate(athlete.reviewedAt)}
+                </span>
+                <span className="meta-item">
+                  👤 {athlete.reviewedBy || "Admin"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Content Grid */}
         <div className="detail-content">
           {/* Left Column - Personal & Guardian Info */}

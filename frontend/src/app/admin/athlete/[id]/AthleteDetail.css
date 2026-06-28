@@ -246,6 +246,58 @@
   max-width: 400px;
 }
 
+.rejection-section {
+  background: white;
+  border-left: 4px solid #ef4444;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.rejection-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #fee2e2;
+}
+
+.rejection-icon {
+  font-size: 24px;
+}
+
+.rejection-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0;
+}
+
+.rejection-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rejection-text {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.rejection-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -301,5 +353,14 @@
 
   .info-card {
     padding: 16px;
+  }
+
+  .rejection-section {
+    padding: 16px;
+  }
+
+  .rejection-meta {
+    flex-direction: column;
+    gap: 8px;
   }
 }

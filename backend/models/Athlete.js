@@ -42,58 +42,66 @@ const athleteSchema = new mongoose.Schema(
 
     guardian: {
       guardianName: String,
-
       relation: String,
-
       mobile: String,
-
       email: String,
     },
 
     address: {
       address: String,
-
       district: String,
-
       state: String,
-
       pinCode: String,
     },
 
     club: {
       clubName: String,
-
       coachName: String,
-
       coachMobile: String,
-
       stateAssociation: String,
     },
 
     competition: {
       competitionName: String,
-
       ageGroup: String,
-
       weightCategory: String,
-
       event: String,
     },
 
     documents: {
       passportPhoto: String,
-
       birthCertificate: String,
-
       medicalCertificate: String,
-
       consentForm: String,
     },
 
     status: {
       type: String,
-
+      enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
+    },
+
+    rejectionReason: {
+      type: String,
+      default: "",
+    },
+
+    reviews: [
+      {
+        status: String,
+        comment: String,
+        reviewedBy: String,
+        reviewedAt: Date,
+      },
+    ],
+
+    reviewedBy: {
+      type: String,
+      default: "",
+    },
+
+    reviewedAt: {
+      type: Date,
     },
   },
 

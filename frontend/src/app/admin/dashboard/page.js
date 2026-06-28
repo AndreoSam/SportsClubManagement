@@ -32,6 +32,9 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedAthleteId, setSelectedAthleteId] = useState(null);
+  const [review, setReview] = useState("");
   const [chartData, setChartData] = useState([
     { name: "Pending", value: 0 },
     { name: "Approved", value: 0 },
@@ -88,33 +91,24 @@ export default function Dashboard() {
     router.push("/admin/login");
   };
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (id, status, reviewText = "") => {
     setUpdatingId(id);
+
     try {
-      await api.patch(`/athletes/${id}/status`, { status });
+      await api.patch(`/athletes/${id}/status`, {
+        status,
+        review: reviewText,
+      });
 
-      setAthletes((prevAthletes) =>
-        prevAthletes.map((athlete) =>
-          athlete._id === id ? { ...athlete, status } : athlete,
-        ),
-      );
+      await fetchData();
 
-      const statsRes = await api.get("/athletes/analytics/summary");
-      const statsData = statsRes.data.data || statsRes.data;
-      const newStats = {
-        pending: statsData.pending || 0,
-        approved: statsData.approved || 0,
-        rejected: statsData.rejected || 0,
-      };
-      setStats(newStats);
-      setChartData([
-        { name: "Pending", value: newStats.pending },
-        { name: "Approved", value: newStats.approved },
-        { name: "Rejected", value: newStats.rejected },
-      ]);
+      setShowRejectModal(false);
+      setSelectedAthleteId(null);
+      setReview("");
     } catch (err) {
       console.error("Status update failed", err);
-      await fetchData();
+
+      alert(err.response?.data?.message || "Failed to update athlete status.");
     } finally {
       setUpdatingId(null);
     }
@@ -341,11 +335,13 @@ export default function Dashboard() {
                             )}
                             {a.status !== "Rejected" && (
                               <button
-                                onClick={() => updateStatus(a._id, "Rejected")}
-                                disabled={updatingId === a._id}
+                                onClick={() => {
+                                  setSelectedAthleteId(a._id);
+                                  setShowRejectModal(true);
+                                }}
                                 className="action-btn reject-btn"
                               >
-                                {updatingId === a._id ? "..." : "Reject"}
+                                Reject
                               </button>
                             )}
                             {a.status !== "Pending" && (
@@ -368,6 +364,49 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+      {showRejectModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Reject Athlete</h2>
+
+            <p>Please provide a reason for rejecting this athlete.</p>
+
+            <textarea
+              rows={5}
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="Enter rejection reason..."
+            />
+
+            <div className="modal-actions">
+              <button
+                className="btn btn-danger"
+                onClick={() => {
+                  if (!review.trim()) {
+                    alert("Rejection reason is required.");
+                    return;
+                  }
+
+                  updateStatus(selectedAthleteId, "Rejected", review);
+                }}
+              >
+                Reject Athlete
+              </button>
+
+              <button
+                className="btn"
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setSelectedAthleteId(null);
+                  setReview("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

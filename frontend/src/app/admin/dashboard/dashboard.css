@@ -462,3 +462,33 @@
     font-size: 11px;
   }
 }
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  width: 450px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+}
+
+.modal textarea {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  resize: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}

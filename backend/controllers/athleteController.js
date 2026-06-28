@@ -193,7 +193,7 @@ const getAthleteById = async (req, res) => {
 
 const updateAthleteStatus = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, review } = req.body;
 
     const allowed = ["Pending", "Approved", "Rejected"];
 
@@ -204,25 +204,38 @@ const updateAthleteStatus = async (req, res) => {
       });
     }
 
-    const athlete = await Athlete.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true },
-    );
-
-    if (!athlete) {
-      return res.status(404).json({
+    // Rejection reason is mandatory for rejection
+    if (status === "Rejected" && (!review || review.trim() === "")) {
+      return res.status(400).json({
         success: false,
-        message: "Athlete not found",
+        message: "Rejection reason is required when rejecting an athlete.",
       });
     }
 
-    return res.json({
+    const updateData = {
+      status,
+      reviewedAt: new Date(),
+      reviewedBy: req.admin?.username || "Admin",
+    };
+
+    if (status === "Rejected") {
+      updateData.rejectionReason = review;
+    } else {
+      updateData.rejectionReason = "";
+    }
+
+    const athlete = await Athlete.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true },
+    );
+
+    res.json({
       success: true,
       athlete,
     });
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: error.message,
     });
