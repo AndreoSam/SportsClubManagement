@@ -37,7 +37,10 @@ app.use("/api/auth", authRoutes);
 app.get("/", (req, res) => {
   res.send("Sports Club Backend Running 🚀");
 });
-
+app.get("/ping", (req, res) => {
+  console.log("PING HIT");
+  res.send("pong");
+});
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
