@@ -37,10 +37,23 @@ app.use("/api/auth", authRoutes);
 app.get("/", (req, res) => {
   res.send("Sports Club Backend Running 🚀");
 });
+
 app.get("/ping", (req, res) => {
-  console.log("PING HIT");
-  res.send("pong");
+  console.log("PING HIT 123456789");
+  res.send("pong-123456789");
 });
+
+console.log("SERVER STARTED", new Date().toISOString());
+
+app.get("/debug", (req, res) => {
+  res.json({
+    service: "sportsclubmanagement",
+    time: new Date().toISOString(),
+    pid: process.pid,
+    node: process.version,
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
