@@ -40,9 +40,17 @@ exports.sendOtp = async (req, res) => {
     });
 
     // 6. 📩 Send email in background (NON-BLOCKING)
-    sendOTPEmail(email, otp).catch((emailErr) => {
-      console.error("Email sending failed:", emailErr.message);
-    });
+    console.log("Before sending email");
+
+    sendOTPEmail(email, otp)
+      .then(() => {
+        console.log("Email sent successfully");
+      })
+      .catch((err) => {
+        console.error("Email error:", err);
+      });
+
+    console.log("After calling sendOTPEmail");
   } catch (err) {
     console.log(err);
 
