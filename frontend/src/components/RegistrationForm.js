@@ -58,9 +58,10 @@ export default function RegistrationForm() {
   const [fileErrors, setFileErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
-  const [emailOtp, setEmailOtp] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [isSendingOTP, setIsSendingOTP] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
 
   const fileInputRefs = {
     passportPhoto: useRef(null),
@@ -70,6 +71,12 @@ export default function RegistrationForm() {
   };
 
   const handleInputChange = (section, field, value) => {
+    if (section === "personal" && field === "email") {
+      setEmailVerified(false);
+      setOtp("");
+      setOtpSent(false);
+    }
+
     setFormData((prev) => ({
       ...prev,
       [section]: {
@@ -219,10 +226,69 @@ export default function RegistrationForm() {
     return isValid;
   };
 
+  const sendOTP = async () => {
+    if (!formData.personal.email) {
+      toast.error("Enter Email");
+      return;
+    }
+
+    try {
+      setIsSendingOTP(true);
+
+      const res = await api.post("/auth/send-email-otp", {
+        email: formData.personal.email,
+      });
+
+      console.log("data: ", res.data);
+      setOtpSent(true);
+      toast.success("OTP Sent");
+    } catch (err) {
+      console.log(err);
+      console.log(err.response);
+      console.log(err.response?.data);
+      if (err.response?.status === 409) {
+        alert("Email already registered.");
+        return;
+      }
+
+      alert("Unable to send OTP");
+      toast.error(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setIsSendingOTP(false);
+    }
+  };
+
+  const verifyOTP = async () => {
+    if (!otp) {
+      toast.error("Enter OTP");
+      return;
+    }
+
+    try {
+      const res = await api.post("/auth/verify-email-otp", {
+        email: formData.personal.email,
+        otp,
+      });
+
+      if (res.data.success) {
+        setEmailVerified(true);
+        toast.success("Email Verified");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid OTP");
+    }
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
     setIsSubmitting(true);
+
+    if (!emailVerified) {
+      toast.error("Please verify your email before submitting.");
+      setIsSubmitting(false);
+      return;
+    }
 
     if (!validateForm()) {
       toast.error("Please fix all errors before submitting");
@@ -275,8 +341,15 @@ export default function RegistrationForm() {
       setFileErrors({});
       setTouched({});
       setSubmitAttempted(false);
+      setOtp("");
+      setOtpSent(false);
+      setEmailVerified(false);
     } catch (err) {
       toast.error(err.response?.data?.message || "Submission Failed");
+      // if (err.response?.status === 409) {
+      //   alert(err.response.data.message);
+      //   return;
+      // }
     } finally {
       setIsSubmitting(false);
     }
@@ -304,6 +377,13 @@ export default function RegistrationForm() {
             onInputChange={handleInputChange}
             onBlur={handleBlur}
             setFieldError={setFieldError}
+            otp={otp}
+            otpSent={otpSent}
+            emailVerified={emailVerified}
+            onOtpChange={setOtp}
+            isSendingOTP={isSendingOTP}
+            onSendOTP={sendOTP}
+            onVerifyOTP={verifyOTP}
           />
 
           <GuardianDetails
@@ -353,6 +433,7 @@ export default function RegistrationForm() {
             onFileChange={handleFileChange}
             onFileClick={handleFileClick}
             setFileFieldError={setFileFieldError}
+            emailVerified={emailVerified}
           />
 
           <div className="form-actions">

@@ -1,4 +1,5 @@
 const Athlete = require("../models/Athlete");
+const Otp = require("../models/Otp");
 const uploadToImageKit = require("../utils/uploadToImageKit");
 
 // 👉 helper to calculate age from DOB
@@ -26,6 +27,19 @@ const registerAthlete = async (req, res) => {
     console.log(req.files);
 
     const data = JSON.parse(req.body.data);
+
+    const verifiedOtp = await Otp.findOne({
+      email: data.personal.email,
+      verified: true,
+    });
+
+    if (!verifiedOtp) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is not verified.",
+      });
+    }
+
     const files = req.files;
 
     // ✅ FIX: calculate age here (IMPORTANT FIX)
@@ -74,10 +88,28 @@ const registerAthlete = async (req, res) => {
     }
 
     // ---------------- SAVE TO DB ----------------
+    // Check if athlete already exists
+    const existingAthlete = await Athlete.findOne({
+      $or: [
+        { "personal.mobile": data.personal.mobile },
+        { "personal.email": data.personal.email },
+      ],
+    });
 
+    if (existingAthlete) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "An athlete with this mobile number or email is already registered.",
+      });
+    }
     const athlete = await Athlete.create({
       ...data,
       documents: uploadedFiles,
+    });
+
+    await Otp.deleteOne({
+      email: data.personal.email,
     });
 
     console.log("SAVED ATHLETE:", athlete);

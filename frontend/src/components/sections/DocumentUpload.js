@@ -15,6 +15,7 @@ const DocumentUpload = ({
   onFileChange,
   onFileClick,
   setFileFieldError,
+  emailVerified,
 }) => {
   const validateFile = (field, file) => {
     let error = "";
@@ -49,9 +50,17 @@ const DocumentUpload = ({
         <label className="form-label">
           {icon} {label} <span className="required">*</span>
         </label>
+
         <div
-          className={`file-upload-wrapper ${hasError ? "error" : ""}`}
+          className={`file-upload-wrapper ${hasError ? "error" : ""} ${
+            !emailVerified ? "disabled-upload" : ""
+          }`}
           onClick={() => {
+            if (!emailVerified) {
+              alert("Please verify your email before uploading documents.");
+              return;
+            }
+
             if (onFileClick && fileInputRefs[field]) {
               onFileClick(field);
             }
@@ -60,6 +69,7 @@ const DocumentUpload = ({
           <input
             ref={fileInputRefs[field] || null}
             type="file"
+            disabled={!emailVerified}
             onChange={(e) => handleFileChange(field, e.target.files[0])}
             accept=".pdf,.jpg,.jpeg,.png"
             style={{ display: "none" }}

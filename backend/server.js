@@ -7,6 +7,7 @@ require("dotenv").config();
 const athleteRoutes = require("./routes/athleteRoutes");
 
 const adminRoutes = require("./routes/adminRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const connectDB = require("./config/db");
 
@@ -30,6 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/athletes", athleteRoutes);
 
 app.use("/api/admin", adminRoutes);
+
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Sports Club Backend Running 🚀");

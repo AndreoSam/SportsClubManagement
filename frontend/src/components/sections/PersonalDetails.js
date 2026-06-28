@@ -9,6 +9,16 @@ const PersonalDetails = ({
   onInputChange,
   onBlur,
   setFieldError,
+
+  otp,
+  otpSent,
+  emailVerified,
+  onOtpChange,
+  onSendOTP,
+  onVerifyOTP,
+  isSendingOTP = false,
+  isVerifyingOTP = false,
+  otpError = "",
 }) => {
   const validateField = (field, value) => {
     let error = "";
@@ -73,6 +83,9 @@ const PersonalDetails = ({
     }
     validateField(field, value);
   };
+
+  const hasEmailError = errors?.email || false;
+  const isEmailValid = formData?.email && !hasEmailError;
 
   return (
     <section className="form-section">
@@ -139,19 +152,109 @@ const PersonalDetails = ({
           onBlur={handleFieldBlur}
           required={true}
         />
-        <FormField
-          section="personal"
-          field="email"
-          label="Email Address"
-          type="email"
-          value={formData?.email || ""}
-          error={errors?.email || ""}
-          touched={touched || {}}
-          submitAttempted={submitAttempted || false}
-          onInputChange={handleFieldChange}
-          onBlur={handleFieldBlur}
-          required={true}
-        />
+
+        {/* Email Field with OTP Verification */}
+        <div className="form-group email-verification-group">
+          <label className="form-label">
+            Email Address <span className="required">*</span>
+          </label>
+
+          <div className="email-input-wrapper">
+            <input
+              type="email"
+              className={`form-input ${hasEmailError ? "error" : ""}`}
+              value={formData?.email || ""}
+              onChange={(e) =>
+                handleFieldChange("personal", "email", e.target.value)
+              }
+              onBlur={() => handleFieldBlur("personal", "email")}
+              placeholder="Enter email address"
+              disabled={emailVerified}
+            />
+
+            {/* Show Send OTP button ONLY before OTP is sent */}
+            {!otpSent && !emailVerified && (
+              <button
+                type="button"
+                className="otp-btn send-otp-btn"
+                onClick={onSendOTP}
+                disabled={!isEmailValid || isSendingOTP}
+              >
+                {isSendingOTP ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    Sending...
+                  </>
+                ) : (
+                  "Send OTP"
+                )}
+              </button>
+            )}
+
+            {/* Verified Badge */}
+            {emailVerified && (
+              <span className="verified-badge">
+                <span className="verified-icon">✅</span>
+                Verified
+              </span>
+            )}
+          </div>
+
+          {hasEmailError && (
+            <span className="error-message">{errors?.email}</span>
+          )}
+
+          {otpError && !emailVerified && (
+            <span className="error-message">{otpError}</span>
+          )}
+        </div>
+
+        {/* OTP Verification Section */}
+        {otpSent && !emailVerified && (
+          <div className="form-group otp-verification-group full-width">
+            <div className="otp-wrapper">
+              <div className="otp-input-wrapper">
+                <input
+                  type="text"
+                  className="otp-input"
+                  value={otp || ""}
+                  onChange={(e) => onOtpChange(e.target.value)}
+                  placeholder="Enter 6-digit OTP"
+                  maxLength={6}
+                  autoFocus
+                />
+
+                <button
+                  type="button"
+                  className="otp-btn verify-otp-btn"
+                  onClick={onVerifyOTP}
+                  disabled={!otp || otp.length !== 6 || isVerifyingOTP}
+                >
+                  {isVerifyingOTP ? (
+                    <>
+                      <span className="spinner-small"></span>
+                      Verifying...
+                    </>
+                  ) : (
+                    "Verify OTP"
+                  )}
+                </button>
+              </div>
+
+              <div className="otp-help-text">
+                OTP has been sent to <strong>{formData?.email}</strong>
+                <button
+                  type="button"
+                  className="resend-otp-link"
+                  onClick={onSendOTP}
+                  disabled={isSendingOTP}
+                >
+                  {isSendingOTP ? "Sending..." : "Resend OTP"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
