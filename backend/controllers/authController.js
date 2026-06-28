@@ -8,7 +8,7 @@ exports.sendOtp = async (req, res) => {
 
     console.log("Checking email:", email);
 
-    // 1. Check existing athlete
+    // Check if email already exists
     const existingAthlete = await Athlete.findOne({
       "personal.email": email,
     });
@@ -20,43 +20,40 @@ exports.sendOtp = async (req, res) => {
       });
     }
 
-    // 2. Generate OTP
+    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 3. Clear old OTPs
+    // Delete previous OTPs
     await Otp.deleteMany({ email });
 
-    // 4. Save OTP in DB FIRST
+    // Save new OTP
     await Otp.create({
       email,
       otp,
       expiresAt: new Date(Date.now() + 5 * 60 * 1000),
     });
 
-    // 5. ⚡ RESPOND IMMEDIATELY (IMPORTANT FIX)
-    res.json({
+    console.log("OTP saved to DB");
+
+    // Send email
+    console.log("Sending email...");
+    const info = await sendOTPEmail(email, otp);
+
+    console.log("Email sent successfully");
+    console.log("Accepted:", info.accepted);
+    console.log("Rejected:", info.rejected);
+    console.log("Response:", info.response);
+
+    return res.status(200).json({
       success: true,
       message: "OTP Sent",
     });
-
-    // 6. 📩 Send email in background (NON-BLOCKING)
-    console.log("Before sending email");
-
-    sendOTPEmail(email, otp)
-      .then(() => {
-        console.log("Email sent successfully");
-      })
-      .catch((err) => {
-        console.error("Email error:", err);
-      });
-
-    console.log("After calling sendOTPEmail");
   } catch (err) {
-    console.log(err);
+    console.error("sendOtp Error:", err);
 
     return res.status(500).json({
       success: false,
-      message: "Failed to send OTP",
+      message: err.message || "Failed to send OTP",
     });
   }
 };
