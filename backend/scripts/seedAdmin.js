@@ -1,7 +1,19 @@
 const mongoose = require("mongoose");
-require("dotenv").config();
+const path = require("path");
+const dns = require("dns");
+
+dns.setDefaultResultOrder("ipv4first");
+
+// Optional: Try Google's DNS servers
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+require("dotenv").config({
+  path: path.resolve(__dirname, "../.env"),
+});
 
 const bcrypt = require("bcrypt");
+
+console.log("URI:", process.env.MONGO_URI);
 
 (async () => {
   try {
@@ -9,7 +21,7 @@ const bcrypt = require("bcrypt");
       serverSelectionTimeoutMS: 5000,
     });
 
-    console.log("Connected");
+    console.log("✅ Connected to MongoDB");
 
     const Admin = require("../models/Admin");
 
@@ -17,25 +29,23 @@ const bcrypt = require("bcrypt");
       email: process.env.ADMIN_EMAIL,
     });
 
-    await Admin.deleteMany({});
-
     if (existing) {
-      console.log("Admin already exists");
-      process.exit();
+      console.log("⚠️ Admin already exists");
+      process.exit(0);
     }
 
     const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
 
     await Admin.create({
-      username: process.env.ADMIN_USERNAME, // ✅ added
+      username: process.env.ADMIN_USERNAME,
       email: process.env.ADMIN_EMAIL,
       password: hash,
     });
 
-    console.log("Admin created");
-    process.exit();
+    console.log("✅ Admin created successfully");
+    process.exit(0);
   } catch (err) {
-    console.log(err);
+    console.error("❌ Error:", err);
     process.exit(1);
   }
 })();
