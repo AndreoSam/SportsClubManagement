@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 30000,
 });
-
+console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
 // 🔐 INTERCEPTOR (ATTACH TOKEN AUTOMATICALLY)
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
@@ -28,7 +28,7 @@ api.interceptors.response.use(
       console.error("API connection failed:", error.message);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
