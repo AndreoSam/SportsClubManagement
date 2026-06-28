@@ -20,6 +20,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://sports-club-management-chi.vercel.app",
+      "https://sports-club-management-git-main-andreo-samadders-projects.vercel.app",
     ],
     credentials: true,
   }),
