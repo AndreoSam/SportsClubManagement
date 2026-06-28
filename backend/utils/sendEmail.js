@@ -16,25 +16,32 @@ const transporter = nodemailer.createTransport({
 const sendOTPEmail = async (email, otp) => {
   const logs = [];
 
-  logs.push("Verifying SMTP...");
-  console.log("Verifying SMTP...");
+  try {
+    logs.push("Verifying SMTP...");
+    console.log("Verifying SMTP...");
 
-  await transporter.verify();
+    await transporter.verify();
 
-  logs.push("SMTP Verified");
-  console.log("SMTP Verified");
+    logs.push("SMTP Verified");
+    console.log("SMTP Verified");
 
-  const info = await transporter.sendMail({
-    from: `"Sports Club" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "Your OTP",
-    text: `Your OTP is ${otp}`,
-  });
+    const info = await transporter.sendMail({
+      from: `"Sports Club" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Your OTP",
+      text: `Your OTP is ${otp}`,
+    });
 
-  logs.push(`Mail Response: ${info.response}`);
-  console.log("Mail Response:", info.response);
+    logs.push(`Mail Response: ${info.response}`);
+    console.log("Mail Response:", info.response);
 
-  return { info, logs };
+    return { info, logs };
+  } catch (error) {
+    const errorMsg = `Email Error: ${error.message}`;
+    logs.push(errorMsg);
+    console.error(errorMsg);
+    throw error;
+  }
 };
 
 module.exports = sendOTPEmail;
