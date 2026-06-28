@@ -14,10 +14,14 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendOTPEmail = async (email, otp) => {
+  const logs = [];
+
+  logs.push("Verifying SMTP...");
   console.log("Verifying SMTP...");
 
   await transporter.verify();
 
+  logs.push("SMTP Verified");
   console.log("SMTP Verified");
 
   const info = await transporter.sendMail({
@@ -27,9 +31,10 @@ const sendOTPEmail = async (email, otp) => {
     text: `Your OTP is ${otp}`,
   });
 
+  logs.push(`Mail Response: ${info.response}`);
   console.log("Mail Response:", info.response);
 
-  return info;
+  return { info, logs };
 };
 
 module.exports = sendOTPEmail;
