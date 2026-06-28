@@ -239,22 +239,21 @@ export default function RegistrationForm() {
         email: formData.personal.email,
       });
 
-      console.log("data: ", res.data);
+      console.log("OTP response:", res.data);
+
       setOtpSent(true);
       toast.success("OTP Sent");
     } catch (err) {
       console.log(err);
-      console.log(err.response);
-      console.log(err.response?.data);
+
       if (err.response?.status === 409) {
-        alert("Email already registered.");
+        toast.error("Email already registered");
         return;
       }
 
-      alert("Unable to send OTP");
-      toast.error(err.response?.data?.message || "Failed to send OTP");
+      toast.error(err.response?.data?.message || "Unable to send OTP");
     } finally {
-      setIsSendingOTP(false);
+      setIsSendingOTP(false); // ✅ THIS IS THE FIX
     }
   };
 
