@@ -1,50 +1,23 @@
-const nodemailer = require("nodemailer");
-const dns = require("dns");
+const { Resend } = require("resend");
 
-dns.setDefaultResultOrder("ipv4first");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendOTPEmail = async (email, otp) => {
-  const logs = [];
+  const result = await resend.emails.send({
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Your OTP",
+    html: `
+      <h2>Sports Club Management</h2>
+      <p>Your OTP is:</p>
+      <h1>${otp}</h1>
+      <p>This OTP is valid for 5 minutes.</p>
+    `,
+  });
 
-  try {
-    logs.push("Verifying SMTP...");
-    console.log("Verifying SMTP...");
+  console.log(result);
 
-    await transporter.verify();
-
-    logs.push("SMTP Verified");
-    console.log("SMTP Verified");
-
-    const info = await transporter.sendMail({
-      from: `"Sports Club" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Your OTP",
-      text: `Your OTP is ${otp}`,
-    });
-
-    logs.push(`Mail Response: ${info.response}`);
-    console.log("Mail Response:", info.response);
-
-    return { info, logs };
-  } catch (error) {
-    const errorMsg = `Email Error: ${error.message}`;
-    logs.push(errorMsg);
-    console.error(errorMsg);
-    throw error;
-  }
+  return result;
 };
 
 module.exports = sendOTPEmail;
