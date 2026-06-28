@@ -36,7 +36,16 @@ exports.sendOtp = async (req, res) => {
     });
 
     // Send email
-    await sendOTPEmail(email, otp);
+    try {
+      await sendOTPEmail(email, otp);
+    } catch (emailErr) {
+      console.error("Email sending error:", emailErr);
+      await Otp.deleteOne({ email, otp });
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP. Please try again.",
+      });
+    }
 
     return res.json({
       success: true,
