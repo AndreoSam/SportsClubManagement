@@ -240,6 +240,9 @@ export default function RegistrationForm() {
       });
 
       console.log("OTP response:", res.data);
+      if (res.data.logs) {
+        res.data.logs.forEach((log) => console.log("[Backend]", log));
+      }
 
       setOtpSent(true);
       toast.success("OTP Sent");

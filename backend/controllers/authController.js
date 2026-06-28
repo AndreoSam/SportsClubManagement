@@ -36,7 +36,7 @@ exports.sendOtp = async (req, res) => {
 
     console.log("7. Before sendOTPEmail");
 
-    const info = await sendOTPEmail(email, otp);
+    const { info, logs } = await sendOTPEmail(email, otp);
 
     console.log("8. After sendOTPEmail");
     console.log(info);
@@ -44,6 +44,7 @@ exports.sendOtp = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "OTP Sent",
+      logs,
     });
   } catch (err) {
     console.error("ERROR:", err);
