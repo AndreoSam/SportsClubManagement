@@ -3,6 +3,8 @@ const Athlete = require("../models/Athlete");
 const sendOTPEmail = require("../utils/sendEmail");
 
 exports.sendOtp = async (req, res) => {
+  console.log("EMAIL_USER:", process.env.EMAIL_USER ? "✓ Set" : "✗ Missing");
+  console.log("EMAIL_PASS:", process.env.EMAIL_PASS ? "✓ Set" : "✗ Missing");
   try {
     console.log("1. Request received");
 
