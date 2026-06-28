@@ -246,14 +246,17 @@ export default function RegistrationForm() {
     } catch (err) {
       console.log(err);
 
-      if (err.response?.status === 409) {
+      if (err.code === "ECONNABORTED") {
+        toast.error("Request timeout. Check your internet or API URL.");
+      } else if (err.response?.status === 409) {
         toast.error("Email already registered");
-        return;
+      } else if (!err.response) {
+        toast.error("Cannot reach server. Check NEXT_PUBLIC_API_URL.");
+      } else {
+        toast.error(err.response?.data?.message || "Unable to send OTP");
       }
-
-      toast.error(err.response?.data?.message || "Unable to send OTP");
     } finally {
-      setIsSendingOTP(false); // ✅ THIS IS THE FIX
+      setIsSendingOTP(false);
     }
   };
 
