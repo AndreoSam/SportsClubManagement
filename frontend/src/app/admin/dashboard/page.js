@@ -28,13 +28,18 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 export default function Dashboard() {
-  const [athletes, setAthletes] = useState([]);
+  const [allAthletes, setAllAthletes] = useState([]);
+  const [filteredAthletes, setFilteredAthletes] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedAthleteId, setSelectedAthleteId] = useState(null);
   const [review, setReview] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [chartData, setChartData] = useState([
     { name: "Pending", value: 0 },
     { name: "Approved", value: 0 },
@@ -55,12 +60,13 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const [athletesRes, statsRes] = await Promise.all([
-        api.get("/athletes"),
+        api.get("/athletes", { params: { limit: 10000 } }),
         api.get("/athletes/analytics/summary"),
       ]);
 
       const athletesData = athletesRes.data.data || athletesRes.data || [];
-      setAthletes(athletesData);
+      setAllAthletes(athletesData);
+      setFilteredAthletes(athletesData);
 
       const statsData = statsRes.data.data || statsRes.data;
       const newStats = {
@@ -86,10 +92,38 @@ export default function Dashboard() {
     fetchData();
   }, [fetchData]);
 
+  useEffect(() => {
+    const filtered = allAthletes.filter((athlete) => {
+      const matchesSearch =
+        athlete.personal?.fullName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        athlete.personal?.mobile
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        athlete.personal?.email
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase());
+
+      const matchesStatus =
+        filterStatus === "All" || athlete.status === filterStatus;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    setFilteredAthletes(filtered);
+    setCurrentPage(1);
+  }, [searchQuery, filterStatus, allAthletes]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/admin/login");
   };
+
+  const totalPages = Math.ceil(filteredAthletes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAthletes = filteredAthletes.slice(startIndex, endIndex);
 
   const updateStatus = async (id, status, reviewText = "") => {
     setUpdatingId(id);
@@ -100,7 +134,11 @@ export default function Dashboard() {
         review: reviewText,
       });
 
-      await fetchData();
+      setAllAthletes((prev) =>
+        prev.map((athlete) =>
+          athlete._id === id ? { ...athlete, status } : athlete,
+        ),
+      );
 
       setShowRejectModal(false);
       setSelectedAthleteId(null);
@@ -115,12 +153,12 @@ export default function Dashboard() {
   };
 
   const exportExcel = () => {
-    if (!athletes.length) {
+    if (!filteredAthletes.length) {
       alert("No data to export");
       return;
     }
 
-    const formattedData = athletes.map((a) => ({
+    const formattedData = filteredAthletes.map((a) => ({
       Name: a.personal?.fullName || "",
       Mobile: a.personal?.mobile || "",
       Email: a.personal?.email || "",
@@ -171,14 +209,34 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="header-right">
-            <button onClick={fetchData} className="icon-btn" disabled={loading}>
-              {loading ? "⏳" : "🔄"}
+            <button
+              onClick={fetchData}
+              className="header-btn refresh-btn"
+              disabled={loading}
+              title="Refresh data"
+            >
+              <span className={`refresh-icon ${loading ? "spinning" : ""}`}>
+                ↻
+              </span>
+              <span className="btn-text">
+                {loading ? "Refreshing" : "Refresh"}
+              </span>
             </button>
-            <button onClick={exportExcel} className="btn btn-success">
-              📊 Export
+            <button
+              onClick={exportExcel}
+              className="header-btn export-btn"
+              title="Export to Excel"
+            >
+              <span className="btn-icon">📊</span>
+              <span className="btn-text">Export</span>
             </button>
-            <button onClick={handleLogout} className="btn btn-danger">
-              🚪 Logout
+            <button
+              onClick={handleLogout}
+              className="header-btn logout-btn"
+              title="Logout"
+            >
+              <span className="btn-icon">🚪</span>
+              <span className="btn-text">Logout</span>
             </button>
           </div>
         </div>
@@ -255,8 +313,35 @@ export default function Dashboard() {
           <div className="table-card">
             <div className="table-header">
               <h3 className="section-title">Athletes List</h3>
-              <span className="table-count">{athletes.length} total</span>
+              <span className="table-count">
+                {filteredAthletes.length} of {allAthletes.length} total
+              </span>
             </div>
+
+            <div className="table-controls">
+              <div className="search-wrapper">
+                <input
+                  type="text"
+                  placeholder="🔍 Search by name, mobile, or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              <div className="filter-wrapper">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="All">All Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
             <div className="table-wrapper">
               <table className="table">
                 <thead>
@@ -277,15 +362,19 @@ export default function Dashboard() {
                         <p>Loading...</p>
                       </td>
                     </tr>
-                  ) : athletes.length === 0 ? (
+                  ) : paginatedAthletes.length === 0 ? (
                     <tr>
                       <td colSpan="6" className="empty-state">
                         <div className="empty-icon">📋</div>
-                        <p>No athletes found</p>
+                        <p>
+                          {searchQuery || filterStatus !== "All"
+                            ? "No athletes match your filters"
+                            : "No athletes found"}
+                        </p>
                       </td>
                     </tr>
                   ) : (
-                    athletes.map((a) => (
+                    paginatedAthletes.map((a) => (
                       <tr
                         key={a._id}
                         className="table-row"
@@ -316,14 +405,6 @@ export default function Dashboard() {
                         </td>
                         <td onClick={(e) => e.stopPropagation()}>
                           <div className="action-buttons">
-                            <button
-                              onClick={() =>
-                                router.push(`/admin/athlete/${a._id}`)
-                              }
-                              className="action-btn view-btn"
-                            >
-                              👁️
-                            </button>
                             {a.status !== "Approved" && (
                               <button
                                 onClick={() => updateStatus(a._id, "Approved")}
@@ -361,6 +442,32 @@ export default function Dashboard() {
                 </tbody>
               </table>
             </div>
+
+            {filteredAthletes.length > 0 && (
+              <div className="pagination">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="pagination-btn"
+                >
+                  ← Previous
+                </button>
+                <div className="pagination-info">
+                  Page {currentPage} of {totalPages} • Showing{" "}
+                  {Math.min(itemsPerPage, filteredAthletes.length - startIndex)}{" "}
+                  of {filteredAthletes.length}
+                </div>
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="pagination-btn"
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>
