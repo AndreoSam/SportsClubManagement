@@ -3,28 +3,22 @@
 import { useState, useRef } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import PersonalDetails from "./sections/PersonalDetails";
-import GuardianDetails from "./sections/GuardianDetails";
-import AddressDetails from "./sections/AddressDetails";
-import ClubDetails from "./sections/ClubDetails";
-import CompetitionDetails from "./sections/CompetitionDetails";
-import DocumentUpload from "./sections/DocumentUpload";
+import CoachPersonalDetails from "./sections/CoachPersonalDetails";
+import CoachAddressDetails from "./sections/CoachAddressDetails";
+import CoachQualification from "./sections/CoachQualification";
+import CoachExperience from "./sections/CoachExperience";
+import CoachClubDetails from "./sections/CoachClubDetails";
+import CoachDocumentUpload from "./sections/CoachDocumentUpload";
 import PasswordSection from "./sections/PasswordSection";
 import "./RegistrationForm.css";
 
-export default function RegistrationForm() {
+export default function CoachRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     personal: {
       fullName: "",
-      gender: "",
       dob: "",
-      mobile: "",
-      email: "",
-    },
-    guardian: {
-      guardianName: "",
-      relation: "",
+      gender: "",
       mobile: "",
       email: "",
     },
@@ -34,17 +28,19 @@ export default function RegistrationForm() {
       state: "",
       pinCode: "",
     },
+    qualification: {
+      highestQualification: "",
+      coachingCertification: "",
+      licenseNumber: "",
+    },
+    experience: {
+      yearsOfExperience: "",
+      previousClubs: "",
+      sportsSpecialized: "",
+    },
     club: {
       clubName: "",
-      coachName: "",
-      coachMobile: "",
       stateAssociation: "",
-    },
-    competition: {
-      competitionName: "",
-      ageGroup: "",
-      weightCategory: "",
-      event: "",
     },
     password: "",
     confirmPassword: "",
@@ -52,9 +48,9 @@ export default function RegistrationForm() {
 
   const [files, setFiles] = useState({
     passportPhoto: null,
-    birthCertificate: null,
-    medicalCertificate: null,
-    consentForm: null,
+    governmentId: null,
+    coachingCertificate: null,
+    resume: null,
   });
 
   const [errors, setErrors] = useState({});
@@ -69,9 +65,9 @@ export default function RegistrationForm() {
 
   const fileInputRefs = {
     passportPhoto: useRef(null),
-    birthCertificate: useRef(null),
-    medicalCertificate: useRef(null),
-    consentForm: useRef(null),
+    governmentId: useRef(null),
+    coachingCertificate: useRef(null),
+    resume: useRef(null),
   };
 
   const handleInputChange = (section, field, value) => {
@@ -109,28 +105,25 @@ export default function RegistrationForm() {
       [field]: file,
     }));
 
-    // Clear previous file error
     setFileErrors((prev) => ({
       ...prev,
       [field]: "",
     }));
 
-    // Validate file immediately
     if (file) {
       let error = "";
-      const MAX_FILE_SIZE = 5 * 1024 * 1024;
-      const ALLOWED_FILE_TYPES = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "application/pdf",
-      ];
+      const MAX_IMAGE_SIZE = 1 * 1024 * 1024;
+      const MAX_PDF_SIZE = 2 * 1024 * 1024;
+      const MAX_SIZE = field === "resume" ? MAX_PDF_SIZE : MAX_IMAGE_SIZE;
+      const ALLOWED_TYPES =
+        field === "resume" ? ["application/pdf"] : ["image/jpeg", "image/jpg", "image/png"];
 
-      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        error = "Only JPG, PNG, and PDF files are allowed";
-      } else if (file.size > MAX_FILE_SIZE) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        error = field === "resume" ? "Only PDF files allowed" : "Only JPG, PNG files allowed";
+      } else if (file.size > MAX_SIZE) {
         const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-        error = `File size (${fileSizeInMB}MB) exceeds the maximum allowed size of 5MB`;
+        const limit = field === "resume" ? "2MB" : "1MB";
+        error = `File size (${fileSizeInMB}MB) exceeds the maximum allowed size of ${limit}`;
       }
 
       if (error) {
@@ -155,35 +148,17 @@ export default function RegistrationForm() {
     }));
   };
 
-  const setFieldError = (section, field, error) => {
-    setErrors((prev) => ({
-      ...prev,
-      [section]: {
-        ...prev[section],
-        [field]: error,
-      },
-    }));
-  };
-
-  const setFileFieldError = (field, error) => {
-    setFileErrors((prev) => ({
-      ...prev,
-      [field]: error,
-    }));
-  };
-
   const validateForm = () => {
     let isValid = true;
 
-    // Mark all fields as touched
     const allTouched = {};
-    const sections = ["personal", "guardian", "address", "club", "competition"];
+    const sections = ["personal", "address", "qualification", "experience", "club"];
     const requiredFields = {
-      personal: ["fullName", "gender", "dob", "mobile", "email"],
-      guardian: ["guardianName", "relation", "mobile", "email"],
+      personal: ["fullName", "dob", "gender", "mobile", "email"],
       address: ["address", "district", "state", "pinCode"],
-      club: ["clubName", "coachName", "coachMobile", "stateAssociation"],
-      competition: ["competitionName", "ageGroup", "weightCategory", "event"],
+      qualification: ["highestQualification", "coachingCertification", "licenseNumber"],
+      experience: ["yearsOfExperience", "previousClubs", "sportsSpecialized"],
+      club: ["clubName", "stateAssociation"],
     };
 
     sections.forEach((section) => {
@@ -193,35 +168,33 @@ export default function RegistrationForm() {
     });
     setTouched(allTouched);
 
-    // Validate all sections
-    const personalErrors = PersonalDetails.validate(formData.personal);
-    const guardianErrors = GuardianDetails.validate(formData.guardian);
-    const addressErrors = AddressDetails.validate(formData.address);
-    const clubErrors = ClubDetails.validate(formData.club);
-    const competitionErrors = CompetitionDetails.validate(formData.competition);
-    const documentErrors = DocumentUpload.validate(files);
+    const personalErrors = CoachPersonalDetails.validate(formData.personal);
+    const addressErrors = CoachAddressDetails.validate(formData.address);
+    const qualificationErrors = CoachQualification.validate(formData.qualification);
+    const experienceErrors = CoachExperience.validate(formData.experience);
+    const clubErrors = CoachClubDetails.validate(formData.club);
+    const documentErrors = CoachDocumentUpload.validate(files);
     const passErrors = PasswordSection.validate(formData.password, formData.confirmPassword);
 
-    // Merge errors
     const newErrors = {};
     if (Object.keys(personalErrors).length > 0) {
       newErrors.personal = personalErrors;
-      isValid = false;
-    }
-    if (Object.keys(guardianErrors).length > 0) {
-      newErrors.guardian = guardianErrors;
       isValid = false;
     }
     if (Object.keys(addressErrors).length > 0) {
       newErrors.address = addressErrors;
       isValid = false;
     }
-    if (Object.keys(clubErrors).length > 0) {
-      newErrors.club = clubErrors;
+    if (Object.keys(qualificationErrors).length > 0) {
+      newErrors.qualification = qualificationErrors;
       isValid = false;
     }
-    if (Object.keys(competitionErrors).length > 0) {
-      newErrors.competition = competitionErrors;
+    if (Object.keys(experienceErrors).length > 0) {
+      newErrors.experience = experienceErrors;
+      isValid = false;
+    }
+    if (Object.keys(clubErrors).length > 0) {
+      newErrors.club = clubErrors;
       isValid = false;
     }
     if (Object.keys(passErrors).length > 0) {
@@ -232,7 +205,7 @@ export default function RegistrationForm() {
     setErrors(newErrors);
     setFileErrors(documentErrors);
 
-    return isValid;
+    return isValid && Object.keys(documentErrors).length === 0;
   };
 
   const sendOTP = async () => {
@@ -248,22 +221,14 @@ export default function RegistrationForm() {
         email: formData.personal.email,
       });
 
-      console.log("OTP response:", res.data);
-      if (res.data.logs) {
-        res.data.logs.forEach((log) => console.log("[Backend]", log));
+      if (res.data.success) {
+        setOtpSent(true);
+        toast.success("OTP Sent");
       }
-
-      setOtpSent(true);
-      toast.success("OTP Sent");
     } catch (err) {
       console.error("Error:", err);
-      if (err.response?.data?.logs) {
-        err.response.data.logs.forEach((log) => console.error("[Backend Error]", log));
-      }
 
-      if (err.code === "ECONNABORTED") {
-        toast.error("Request timeout. Check your internet or API URL.");
-      } else if (err.response?.status === 409) {
+      if (err.response?.status === 409) {
         toast.error("Email already registered");
       } else if (!err.response) {
         toast.error("Cannot reach server. Check NEXT_PUBLIC_API_URL.");
@@ -323,36 +288,36 @@ export default function RegistrationForm() {
         }
       });
 
-      await api.post("/athletes/register", data, {
+      await api.post("/coaches/register", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      toast.success("Athlete Registered Successfully!");
+      toast.success("Coach Registered Successfully!");
 
       setFormData({
-        personal: { fullName: "", gender: "", dob: "", mobile: "", email: "" },
-        guardian: { guardianName: "", relation: "", mobile: "", email: "" },
+        personal: { fullName: "", dob: "", gender: "", mobile: "", email: "" },
         address: { address: "", district: "", state: "", pinCode: "" },
-        club: {
-          clubName: "",
-          coachName: "",
-          coachMobile: "",
-          stateAssociation: "",
+        qualification: {
+          highestQualification: "",
+          coachingCertification: "",
+          licenseNumber: "",
         },
-        competition: {
-          competitionName: "",
-          ageGroup: "",
-          weightCategory: "",
-          event: "",
+        experience: {
+          yearsOfExperience: "",
+          previousClubs: "",
+          sportsSpecialized: "",
         },
+        club: { clubName: "", stateAssociation: "" },
+        password: "",
+        confirmPassword: "",
       });
       setFiles({
         passportPhoto: null,
-        birthCertificate: null,
-        medicalCertificate: null,
-        consentForm: null,
+        governmentId: null,
+        coachingCertificate: null,
+        resume: null,
       });
       setErrors({});
       setFileErrors({});
@@ -363,10 +328,6 @@ export default function RegistrationForm() {
       setEmailVerified(false);
     } catch (err) {
       toast.error(err.response?.data?.message || "Submission Failed");
-      // if (err.response?.status === 409) {
-      //   alert(err.response.data.message);
-      //   return;
-      // }
     } finally {
       setIsSubmitting(false);
     }
@@ -376,24 +337,23 @@ export default function RegistrationForm() {
     <div className="registration-container">
       <div className="registration-wrapper">
         <div className="registration-header">
-          <div className="header-icon">🏃</div>
+          <div className="header-icon">👨‍🏫</div>
           <div>
-            <h1 className="registration-title">Athlete Registration</h1>
+            <h1 className="registration-title">Coach Registration</h1>
             <p className="registration-subtitle">
-              Complete all sections to register a new athlete
+              Complete all sections to register as a coach
             </p>
           </div>
         </div>
 
         <form onSubmit={submit} noValidate>
-          <PersonalDetails
+          <CoachPersonalDetails
             formData={formData.personal}
             errors={errors.personal || {}}
             touched={touched}
             submitAttempted={submitAttempted}
             onInputChange={handleInputChange}
             onBlur={handleBlur}
-            setFieldError={setFieldError}
             otp={otp}
             otpSent={otpSent}
             emailVerified={emailVerified}
@@ -403,53 +363,44 @@ export default function RegistrationForm() {
             onVerifyOTP={verifyOTP}
           />
 
-          <GuardianDetails
-            formData={formData.guardian}
-            errors={errors.guardian || {}}
-            touched={touched}
-            submitAttempted={submitAttempted}
-            onInputChange={handleInputChange}
-            onBlur={handleBlur}
-            setFieldError={setFieldError}
-          />
-
-          <AddressDetails
+          <CoachAddressDetails
             formData={formData.address}
             errors={errors.address || {}}
             touched={touched}
-            submitAttempted={submitAttempted}
             onInputChange={handleInputChange}
             onBlur={handleBlur}
-            setFieldError={setFieldError}
           />
 
-          <ClubDetails
+          <CoachQualification
+            formData={formData.qualification}
+            errors={errors.qualification || {}}
+            touched={touched}
+            onInputChange={handleInputChange}
+            onBlur={handleBlur}
+          />
+
+          <CoachExperience
+            formData={formData.experience}
+            errors={errors.experience || {}}
+            touched={touched}
+            onInputChange={handleInputChange}
+            onBlur={handleBlur}
+          />
+
+          <CoachClubDetails
             formData={formData.club}
             errors={errors.club || {}}
             touched={touched}
-            submitAttempted={submitAttempted}
             onInputChange={handleInputChange}
             onBlur={handleBlur}
-            setFieldError={setFieldError}
           />
 
-          <CompetitionDetails
-            formData={formData.competition}
-            errors={errors.competition || {}}
-            touched={touched}
-            submitAttempted={submitAttempted}
-            onInputChange={handleInputChange}
-            onBlur={handleBlur}
-            setFieldError={setFieldError}
-          />
-
-          <DocumentUpload
+          <CoachDocumentUpload
             files={files}
             fileErrors={fileErrors}
             fileInputRefs={fileInputRefs}
             onFileChange={handleFileChange}
             onFileClick={handleFileClick}
-            setFileFieldError={setFileFieldError}
             emailVerified={emailVerified}
           />
 

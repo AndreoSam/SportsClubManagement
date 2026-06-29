@@ -1,51 +1,60 @@
-const mongoose = require("mongoose");
-const path = require("path");
 const dns = require("dns");
-
-dns.setDefaultResultOrder("ipv4first");
-
-// Optional: Try Google's DNS servers
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-require("dotenv").config({
-  path: path.resolve(__dirname, "../.env"),
-});
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
-const bcrypt = require("bcrypt");
+const Admin = require("../models/Admin");
 
-console.log("URI:", process.env.MONGO_URI);
-
-(async () => {
+const seedAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
+    const mongoUri = process.env.MONGO_URI;
 
-    console.log("✅ Connected to MongoDB");
-
-    const Admin = require("../models/Admin");
-
-    const existing = await Admin.findOne({
-      email: process.env.ADMIN_EMAIL,
-    });
-
-    if (existing) {
-      console.log("⚠️ Admin already exists");
-      process.exit(0);
+    if (!mongoUri) {
+      throw new Error("MONGO_URI is not defined in .env file");
     }
 
-    const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+    await mongoose.connect(mongoUri);
+    console.log("Connected to MongoDB");
 
-    await Admin.create({
-      username: process.env.ADMIN_USERNAME,
-      email: process.env.ADMIN_EMAIL,
-      password: hash,
+    // Check if admin already exists
+    const existingAdmin = await Admin.findOne({
+      $or: [
+        { username: "admin" },
+        { email: "admin@example.com" }
+      ]
     });
 
-    console.log("✅ Admin created successfully");
-    process.exit(0);
-  } catch (err) {
-    console.error("❌ Error:", err);
+    if (existingAdmin) {
+      console.log("Admin user already exists");
+      await mongoose.connection.close();
+      return;
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash("admin123456", 10);
+
+    // Create admin user
+    const admin = await Admin.create({
+      username: "admin",
+      email: "admin@example.com",
+      password: hashedPassword,
+    });
+
+    console.log("✅ Admin user created successfully!");
+    console.log("Username: admin");
+    console.log("Email: admin@example.com");
+    console.log("Password: admin123456");
+    console.log("\nYou can now login with these credentials at /login");
+
+    await mongoose.connection.close();
+  } catch (error) {
+    console.error("❌ Error seeding admin:", error);
+    await mongoose.connection.close();
     process.exit(1);
   }
-})();
+};
+
+seedAdmin();

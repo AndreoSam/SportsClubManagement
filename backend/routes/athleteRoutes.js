@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const protect = require("../middleware/authMiddleware");
+const { authMiddleware, checkRole } = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 const {
   registerAthlete,
@@ -22,9 +22,9 @@ router.post(
   registerAthlete,
 );
 
-router.get("/analytics/summary", protect, getAthleteAnalytics);
-router.get("/", protect, getAllAthletes);
-router.get("/:id", protect, getAthleteById);
-router.patch("/:id/status", protect, updateAthleteStatus);
+router.get("/analytics/summary", authMiddleware, getAthleteAnalytics);
+router.get("/", authMiddleware, getAllAthletes);
+router.get("/:id", authMiddleware, getAthleteById);
+router.patch("/:id/status", authMiddleware, updateAthleteStatus);
 
 module.exports = router;

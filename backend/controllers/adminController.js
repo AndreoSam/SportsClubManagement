@@ -18,6 +18,7 @@ const loginAdmin = async (req, res) => {
     // ❌ admin not found
     if (!admin) {
       return res.status(400).json({
+        success: false,
         message: "Invalid credentials",
       });
     }
@@ -27,19 +28,37 @@ const loginAdmin = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).json({
+        success: false,
         message: "Invalid credentials",
       });
     }
 
-    // ✅ STEP 3: CREATE TOKEN
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    // ✅ STEP 3: CREATE TOKEN WITH ROLE
+    const token = jwt.sign(
+      {
+        userId: admin._id,
+        email: admin.email,
+        role: "Admin",
+      },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "7d" }
+    );
 
-    return res.json({ token });
+    return res.json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: {
+        id: admin._id,
+        email: admin.email,
+        username: admin.username,
+        role: "Admin",
+      },
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
+      success: false,
       message: error.message,
     });
   }

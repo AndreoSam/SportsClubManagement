@@ -5,7 +5,8 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const athleteRoutes = require("./routes/athleteRoutes");
-
+const athleteProfileRoutes = require("./routes/athleteProfileRoutes");
+const coachRoutes = require("./routes/coachRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const authRoutes = require("./routes/authRoutes");
 
@@ -30,9 +31,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/athletes", athleteRoutes);
-
+app.use("/api/athlete", athleteProfileRoutes);
+app.use("/api/coaches", coachRoutes);
 app.use("/api/admin", adminRoutes);
-
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {

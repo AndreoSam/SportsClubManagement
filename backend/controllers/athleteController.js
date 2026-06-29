@@ -1,6 +1,8 @@
 const Athlete = require("../models/Athlete");
+const User = require("../models/User");
 const Otp = require("../models/Otp");
 const uploadToImageKit = require("../utils/uploadToImageKit");
+const bcrypt = require("bcryptjs");
 
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
@@ -52,18 +54,27 @@ const registerAthlete = async (req, res) => {
 
     data.personal.age = calculateAge(data.personal.dob);
 
-    const existingAthlete = await Athlete.findOne({
-      $or: [
-        { "personal.mobile": data.personal.mobile },
-        { "personal.email": data.personal.email },
-      ],
+    // Check if email already exists in User collection
+    const existingUser = await User.findOne({
+      email: data.personal.email,
     });
 
-    if (existingAthlete) {
+    if (existingUser) {
       return res.status(409).json({
         success: false,
-        message:
-          "An athlete with this mobile number or email is already registered.",
+        message: "Email is already registered.",
+      });
+    }
+
+    // Check if mobile already exists in User collection
+    const existingMobile = await User.findOne({
+      mobile: data.personal.mobile,
+    });
+
+    if (existingMobile) {
+      return res.status(409).json({
+        success: false,
+        message: "Mobile number is already registered.",
       });
     }
 
@@ -128,6 +139,21 @@ const registerAthlete = async (req, res) => {
       console.log("Consent form upload failed:", err.message);
       throw new Error(`Consent form upload failed: ${err.message}`);
     }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    // Create User record
+    const user = await User.create({
+      name: data.personal.fullName,
+      email: data.personal.email,
+      mobile: data.personal.mobile,
+      password: hashedPassword,
+      role: "Athlete",
+      status: "Pending",
+    });
+
+    console.log("User created:", user._id);
 
     // All uploads succeeded, now save to database
     const athlete = await Athlete.create({
