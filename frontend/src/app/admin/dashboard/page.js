@@ -39,7 +39,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(4);
   const [chartData, setChartData] = useState([
     { name: "Pending", value: 0 },
     { name: "Approved", value: 0 },
@@ -214,6 +214,7 @@ export default function Dashboard() {
               className="header-btn refresh-btn"
               disabled={loading}
               title="Refresh data"
+              aria-label="Refresh data"
             >
               <span className={`refresh-icon ${loading ? "spinning" : ""}`}>
                 ↻
@@ -226,16 +227,34 @@ export default function Dashboard() {
               onClick={exportExcel}
               className="header-btn export-btn"
               title="Export to Excel"
+              aria-label="Export data to Excel"
             >
-              <span className="btn-icon">📊</span>
+              <svg
+                className="btn-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+              >
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 9h-4v4h4v-4zm5-7h-4v4h4V5zm0 5h-4v4h4v-4zM8 5H4v4h4V5zm0 5H4v4h4v-4zm0 5H4v4h4v-4z" />
+              </svg>
               <span className="btn-text">Export</span>
             </button>
             <button
               onClick={handleLogout}
               className="header-btn logout-btn"
               title="Logout"
+              aria-label="Logout from dashboard"
             >
-              <span className="btn-icon">🚪</span>
+              <svg
+                className="btn-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+              >
+                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+              </svg>
               <span className="btn-text">Logout</span>
             </button>
           </div>
