@@ -69,6 +69,7 @@ const athleteSchema = new mongoose.Schema(
     },
 
     documents: {
+      folderName: String,
       passportPhoto: String,
       birthCertificate: String,
       medicalCertificate: String,

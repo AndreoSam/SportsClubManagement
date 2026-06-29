@@ -1,15 +1,18 @@
 const imagekit = require("../config/imagekit");
 
-const uploadToImageKit = async (file, folder = "athletes") => {
+const uploadToImageKit = async (file, athleteFolder, documentName) => {
   try {
+    const extension = file.originalname.split(".").pop();
+
     const result = await imagekit.upload({
       file: file.buffer.toString("base64"),
-      fileName: `${Date.now()}-${file.originalname}`,
-      folder: `/${folder}`,
+      fileName: `${documentName}.${extension}`,
+      folder: `/athletes/${athleteFolder}`,
     });
 
     return result.url;
   } catch (error) {
+    console.error(error);
     throw new Error("Image upload failed");
   }
 };

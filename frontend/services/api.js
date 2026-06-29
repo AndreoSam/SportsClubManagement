@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_API_URL ||
     "https://sportsclubmanagement.onrender.com/api",
-  timeout: 60000,
+  timeout: 120000,
 });
 
 export default api;

@@ -2,7 +2,6 @@ const Athlete = require("../models/Athlete");
 const Otp = require("../models/Otp");
 const uploadToImageKit = require("../utils/uploadToImageKit");
 
-// 👉 helper to calculate age from DOB
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
   const today = new Date();
@@ -16,6 +15,15 @@ const calculateAge = (dob) => {
   }
 
   return age;
+};
+
+const generateAthleteFolder = (fullName, athleteId) => {
+  const sanitizedName = fullName
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_-]/g, "");
+
+  return `${sanitizedName}_${athleteId}`;
 };
 
 const registerAthlete = async (req, res) => {
@@ -42,53 +50,8 @@ const registerAthlete = async (req, res) => {
 
     const files = req.files;
 
-    // ✅ FIX: calculate age here (IMPORTANT FIX)
     data.personal.age = calculateAge(data.personal.dob);
 
-    const uploadedFiles = {};
-
-    // ---------------- IMAGEKIT UPLOADS ----------------
-
-    try {
-      console.log("Uploading passport photo...");
-      uploadedFiles.passportPhoto = await uploadToImageKit(
-        files.passportPhoto[0],
-      );
-      console.log("Passport uploaded:", uploadedFiles.passportPhoto);
-    } catch (err) {
-      console.log("Passport upload failed:", err.message);
-    }
-
-    try {
-      console.log("Uploading birth certificate...");
-      uploadedFiles.birthCertificate = await uploadToImageKit(
-        files.birthCertificate[0],
-      );
-      console.log("Birth uploaded:", uploadedFiles.birthCertificate);
-    } catch (err) {
-      console.log("Birth upload failed:", err.message);
-    }
-
-    try {
-      console.log("Uploading medical certificate...");
-      uploadedFiles.medicalCertificate = await uploadToImageKit(
-        files.medicalCertificate[0],
-      );
-      console.log("Medical uploaded:", uploadedFiles.medicalCertificate);
-    } catch (err) {
-      console.log("Medical upload failed:", err.message);
-    }
-
-    try {
-      console.log("Uploading consent form...");
-      uploadedFiles.consentForm = await uploadToImageKit(files.consentForm[0]);
-      console.log("Consent uploaded:", uploadedFiles.consentForm);
-    } catch (err) {
-      console.log("Consent upload failed:", err.message);
-    }
-
-    // ---------------- SAVE TO DB ----------------
-    // Check if athlete already exists
     const existingAthlete = await Athlete.findOne({
       $or: [
         { "personal.mobile": data.personal.mobile },
@@ -103,6 +66,70 @@ const registerAthlete = async (req, res) => {
           "An athlete with this mobile number or email is already registered.",
       });
     }
+
+    const tempId = Date.now().toString();
+    const athleteFolder = generateAthleteFolder(data.personal.fullName, tempId);
+
+    console.log("Generated athlete folder:", athleteFolder);
+
+    const uploadedFiles = {
+      folderName: athleteFolder,
+    };
+
+    // Transactional upload behavior: all uploads must succeed
+    try {
+      console.log("Uploading passport photo...");
+      uploadedFiles.passportPhoto = await uploadToImageKit(
+        files.passportPhoto[0],
+        athleteFolder,
+        "passportPhoto",
+      );
+      console.log("Passport uploaded:", uploadedFiles.passportPhoto);
+    } catch (err) {
+      console.log("Passport upload failed:", err.message);
+      throw new Error(`Passport upload failed: ${err.message}`);
+    }
+
+    try {
+      console.log("Uploading birth certificate...");
+      uploadedFiles.birthCertificate = await uploadToImageKit(
+        files.birthCertificate[0],
+        athleteFolder,
+        "birthCertificate",
+      );
+      console.log("Birth certificate uploaded:", uploadedFiles.birthCertificate);
+    } catch (err) {
+      console.log("Birth certificate upload failed:", err.message);
+      throw new Error(`Birth certificate upload failed: ${err.message}`);
+    }
+
+    try {
+      console.log("Uploading medical certificate...");
+      uploadedFiles.medicalCertificate = await uploadToImageKit(
+        files.medicalCertificate[0],
+        athleteFolder,
+        "medicalCertificate",
+      );
+      console.log("Medical certificate uploaded:", uploadedFiles.medicalCertificate);
+    } catch (err) {
+      console.log("Medical certificate upload failed:", err.message);
+      throw new Error(`Medical certificate upload failed: ${err.message}`);
+    }
+
+    try {
+      console.log("Uploading consent form...");
+      uploadedFiles.consentForm = await uploadToImageKit(
+        files.consentForm[0],
+        athleteFolder,
+        "consentForm",
+      );
+      console.log("Consent form uploaded:", uploadedFiles.consentForm);
+    } catch (err) {
+      console.log("Consent form upload failed:", err.message);
+      throw new Error(`Consent form upload failed: ${err.message}`);
+    }
+
+    // All uploads succeeded, now save to database
     const athlete = await Athlete.create({
       ...data,
       documents: uploadedFiles,
