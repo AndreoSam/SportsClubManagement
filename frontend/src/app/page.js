@@ -1,45 +1,58 @@
 "use client";
 
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 import "./landing.css";
 
 export default function LandingPage() {
   return (
-    <div className="landing-container">
-      <div className="landing-wrapper">
-        <div className="landing-header">
-          <div className="header-logo">🏃‍♂️</div>
-          <h1 className="header-title">Sports Club Management</h1>
-          <p className="header-subtitle">Register as an Athlete or Coach</p>
-        </div>
-
-        <div className="cards-section">
-          <Link href="/register/athlete" className="role-card athlete-card">
-            <div className="card-icon">🏃</div>
-            <h2 className="card-title">Register as Athlete</h2>
-            <p className="card-description">
-              Join our sports club and showcase your athletic skills
+    <>
+      <Navbar showBackButton={false} title="Sports Club Management" />
+      <div className="landing-container">
+        <div className="landing-content">
+          <div className="landing-hero">
+            <h1 className="hero-title">Welcome to Sports Club Management</h1>
+            <p className="hero-subtitle">
+              Register today and join our thriving sports community
             </p>
-            <div className="card-arrow">→</div>
-          </Link>
+          </div>
 
-          <Link href="/register/coach" className="role-card coach-card">
-            <div className="card-icon">👨‍🏫</div>
-            <h2 className="card-title">Register as Coach</h2>
-            <p className="card-description">
-              Share your expertise and guide the next generation
-            </p>
-            <div className="card-arrow">→</div>
-          </Link>
-        </div>
+          <div className="cards-grid">
+            <Link href="/register/athlete" className="card athlete-card">
+              <div className="card-header">
+                <span className="card-icon">🏃</span>
+                <h2 className="card-title">Athlete</h2>
+              </div>
+              <p className="card-text">
+                Register as an athlete and start your journey with us
+              </p>
+              <div className="card-footer">
+                <span className="card-action">Get Started →</span>
+              </div>
+            </Link>
 
-        <div className="login-section">
-          <p className="login-text">Already Registered?</p>
-          <Link href="/login" className="login-link">
-            Login
-          </Link>
+            <Link href="/register/coach" className="card coach-card">
+              <div className="card-header">
+                <span className="card-icon">👨‍🏫</span>
+                <h2 className="card-title">Coach</h2>
+              </div>
+              <p className="card-text">
+                Share your expertise and mentor the next generation
+              </p>
+              <div className="card-footer">
+                <span className="card-action">Get Started →</span>
+              </div>
+            </Link>
+          </div>
+
+          <div className="login-prompt">
+            <p className="prompt-text">Already have an account?</p>
+            <Link href="/login" className="login-button">
+              Sign In
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

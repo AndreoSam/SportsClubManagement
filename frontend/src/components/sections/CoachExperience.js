@@ -14,11 +14,17 @@ export default function CoachExperience({
 
   return (
     <div className="form-section">
-      <h2 className="section-title">Experience</h2>
+      <div className="section-header">
+        <div className="section-icon">⭐</div>
+        <div>
+          <h2 className="section-title">Experience</h2>
+          <p className="section-subtitle">Your coaching journey</p>
+        </div>
+      </div>
 
       <div className="form-grid">
         <div className="form-group">
-          <label>Years of Experience *</label>
+          <label className="form-label">Years of Experience <span className="required">*</span></label>
           <input
             type="number"
             value={formData.yearsOfExperience}
@@ -28,7 +34,7 @@ export default function CoachExperience({
             onBlur={() => onBlur("experience", "yearsOfExperience")}
             placeholder="Enter years of experience"
             min="0"
-            className={getError("yearsOfExperience") ? "input-error" : ""}
+            className={`form-input ${getError("yearsOfExperience") ? "input-error" : ""}`}
           />
           {getError("yearsOfExperience") && (
             <span className="error-text">{getError("yearsOfExperience")}</span>
@@ -36,14 +42,14 @@ export default function CoachExperience({
         </div>
 
         <div className="form-group full-width">
-          <label>Previous Clubs *</label>
+          <label className="form-label">Previous Clubs <span className="required">*</span></label>
           <input
             type="text"
             value={formData.previousClubs}
             onChange={(e) => onInputChange("experience", "previousClubs", e.target.value)}
             onBlur={() => onBlur("experience", "previousClubs")}
             placeholder="List clubs you've coached in (comma-separated)"
-            className={getError("previousClubs") ? "input-error" : ""}
+            className={`form-input ${getError("previousClubs") ? "input-error" : ""}`}
           />
           {getError("previousClubs") && (
             <span className="error-text">{getError("previousClubs")}</span>
@@ -51,7 +57,7 @@ export default function CoachExperience({
         </div>
 
         <div className="form-group full-width">
-          <label>Sports Specialized In *</label>
+          <label className="form-label">Sports Specialized In <span className="required">*</span></label>
           <input
             type="text"
             value={formData.sportsSpecialized}
@@ -60,7 +66,7 @@ export default function CoachExperience({
             }
             onBlur={() => onBlur("experience", "sportsSpecialized")}
             placeholder="E.g., Cricket, Football, etc."
-            className={getError("sportsSpecialized") ? "input-error" : ""}
+            className={`form-input ${getError("sportsSpecialized") ? "input-error" : ""}`}
           />
           {getError("sportsSpecialized") && (
             <span className="error-text">{getError("sportsSpecialized")}</span>

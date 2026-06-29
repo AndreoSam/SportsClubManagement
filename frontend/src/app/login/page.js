@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "../../services/api";
 import toast from "react-hot-toast";
+import Navbar from "../../components/Navbar";
 import "./login.css";
 
 export default function LoginPage() {
@@ -58,7 +59,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
+    <>
+      <Navbar showBackButton={true} title="Sports Club Management" />
+      <div className="login-container">
       <div className="login-wrapper">
         <div className="login-header">
           <div className="login-icon">🔐</div>
@@ -132,5 +135,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

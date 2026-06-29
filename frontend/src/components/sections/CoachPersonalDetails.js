@@ -21,18 +21,24 @@ export default function CoachPersonalDetails({
 
   return (
     <div className="form-section">
-      <h2 className="section-title">Personal Details</h2>
+      <div className="section-header">
+        <div className="section-icon">👤</div>
+        <div>
+          <h2 className="section-title">Personal Details</h2>
+          <p className="section-subtitle">Enter your basic information</p>
+        </div>
+      </div>
 
       <div className="form-grid">
         <div className="form-group">
-          <label>Full Name *</label>
+          <label className="form-label">Full Name <span className="required">*</span></label>
           <input
             type="text"
             value={formData.fullName}
             onChange={(e) => onInputChange("personal", "fullName", e.target.value)}
             onBlur={() => onBlur("personal", "fullName")}
             placeholder="Enter full name"
-            className={getError("fullName") ? "input-error" : ""}
+            className={`form-input ${getError("fullName") ? "input-error" : ""}`}
           />
           {getError("fullName") && (
             <span className="error-text">{getError("fullName")}</span>
@@ -40,13 +46,13 @@ export default function CoachPersonalDetails({
         </div>
 
         <div className="form-group">
-          <label>Date of Birth *</label>
+          <label className="form-label">Date of Birth <span className="required">*</span></label>
           <input
             type="date"
             value={formData.dob}
             onChange={(e) => onInputChange("personal", "dob", e.target.value)}
             onBlur={() => onBlur("personal", "dob")}
-            className={getError("dob") ? "input-error" : ""}
+            className={`form-input ${getError("dob") ? "input-error" : ""}`}
           />
           {getError("dob") && (
             <span className="error-text">{getError("dob")}</span>
@@ -54,12 +60,12 @@ export default function CoachPersonalDetails({
         </div>
 
         <div className="form-group">
-          <label>Gender *</label>
+          <label className="form-label">Gender <span className="required">*</span></label>
           <select
             value={formData.gender}
             onChange={(e) => onInputChange("personal", "gender", e.target.value)}
             onBlur={() => onBlur("personal", "gender")}
-            className={getError("gender") ? "input-error" : ""}
+            className={`form-input ${getError("gender") ? "input-error" : ""}`}
           >
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
@@ -72,14 +78,14 @@ export default function CoachPersonalDetails({
         </div>
 
         <div className="form-group">
-          <label>Mobile *</label>
+          <label className="form-label">Mobile <span className="required">*</span></label>
           <input
             type="tel"
             value={formData.mobile}
             onChange={(e) => onInputChange("personal", "mobile", e.target.value)}
             onBlur={() => onBlur("personal", "mobile")}
             placeholder="Enter mobile number"
-            className={getError("mobile") ? "input-error" : ""}
+            className={`form-input ${getError("mobile") ? "input-error" : ""}`}
           />
           {getError("mobile") && (
             <span className="error-text">{getError("mobile")}</span>
@@ -87,7 +93,7 @@ export default function CoachPersonalDetails({
         </div>
 
         <div className="form-group full-width">
-          <label>Email *</label>
+          <label className="form-label">Email <span className="required">*</span></label>
           <div className="email-input-wrapper">
             <input
               type="email"
@@ -96,7 +102,7 @@ export default function CoachPersonalDetails({
               onBlur={() => onBlur("personal", "email")}
               placeholder="Enter email"
               disabled={emailVerified}
-              className={getError("email") ? "input-error" : ""}
+              className={`form-input ${getError("email") ? "input-error" : ""}`}
             />
             {!emailVerified && (
               <button
@@ -116,7 +122,7 @@ export default function CoachPersonalDetails({
 
         {otpSent && !emailVerified && (
           <div className="form-group full-width">
-            <label>Enter OTP *</label>
+            <label className="form-label">Enter OTP <span className="required">*</span></label>
             <div className="otp-input-wrapper">
               <input
                 type="text"

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
+import Navbar from "./Navbar";
 import PersonalDetails from "./sections/PersonalDetails";
 import GuardianDetails from "./sections/GuardianDetails";
 import AddressDetails from "./sections/AddressDetails";
@@ -373,9 +374,11 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="registration-container">
-      <div className="registration-wrapper">
-        <div className="registration-header">
+    <>
+      <Navbar showBackButton={true} title="Sports Club Management" />
+      <div className="registration-container">
+        <div className="registration-wrapper">
+          <div className="registration-header">
           <div className="header-icon">🏃</div>
           <div>
             <h1 className="registration-title">Athlete Registration</h1>
@@ -482,5 +485,6 @@ export default function RegistrationForm() {
         </form>
       </div>
     </div>
+    </>
   );
 }

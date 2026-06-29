@@ -23,6 +23,9 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectingApplicationId, setRejectingApplicationId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const fetchApplications = async (pageNum = 1) => {
     try {
@@ -117,31 +120,42 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleReject = async (id) => {
-    const reason = prompt("Enter rejection reason:");
-    if (reason) {
-      try {
-        const token = localStorage.getItem("token");
+  const handleRejectClick = (id) => {
+    setRejectingApplicationId(id);
+    setRejectionReason("");
+    setShowRejectModal(true);
+  };
 
-        await api.patch(
-          `/admin/application/${id}/status`,
-          {
-            status: "Rejected",
-            rejectionReason: reason,
+  const handleRejectSubmit = async () => {
+    if (!rejectionReason.trim()) {
+      toast.error("Please enter a rejection reason");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await api.patch(
+        `/admin/application/${rejectingApplicationId}/status`,
+        {
+          status: "Rejected",
+          rejectionReason: rejectionReason,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        }
+      );
 
-        toast.success("Application rejected!");
-        fetchApplications(page);
-        fetchAnalytics();
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to reject");
-      }
+      toast.success("Application rejected!");
+      setShowRejectModal(false);
+      setRejectingApplicationId(null);
+      setRejectionReason("");
+      fetchApplications(page);
+      fetchAnalytics();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reject");
     }
   };
 
@@ -323,22 +337,22 @@ export default function AdminDashboard() {
                           className="action-btn approve-btn"
                           onClick={() => handleApprove(app.id)}
                         >
-                          ✓
+                          Approve
                         </button>
                       )}
                       {app.status !== "Rejected" && (
                         <button
                           className="action-btn reject-btn"
-                          onClick={() => handleReject(app.id)}
+                          onClick={() => handleRejectClick(app.id)}
                         >
-                          ✕
+                          Reject
                         </button>
                       )}
                       <button
                         className="action-btn delete-btn"
                         onClick={() => handleDelete(app.id)}
                       >
-                        🗑️
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -368,6 +382,54 @@ export default function AdminDashboard() {
           </>
         )}
       </div>
+
+      {showRejectModal && (
+        <div className="modal-overlay" onClick={() => setShowRejectModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">Reject Application</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => setShowRejectModal(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p className="modal-description">
+                Please provide a clear reason for rejecting this application. This will be shown to the applicant.
+              </p>
+
+              <div className="form-group">
+                <label className="form-label">Rejection Reason *</label>
+                <textarea
+                  className="form-textarea"
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Enter the reason for rejection..."
+                  rows="5"
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="modal-btn cancel-btn"
+                onClick={() => setShowRejectModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-btn submit-btn"
+                onClick={handleRejectSubmit}
+              >
+                Reject Application
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

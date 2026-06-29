@@ -14,18 +14,24 @@ export default function CoachClubDetails({
 
   return (
     <div className="form-section">
-      <h2 className="section-title">Club Details</h2>
+      <div className="section-header">
+        <div className="section-icon">🏢</div>
+        <div>
+          <h2 className="section-title">Club Details</h2>
+          <p className="section-subtitle">Your club information</p>
+        </div>
+      </div>
 
       <div className="form-grid">
         <div className="form-group">
-          <label>Club Name *</label>
+          <label className="form-label">Club Name <span className="required">*</span></label>
           <input
             type="text"
             value={formData.clubName}
             onChange={(e) => onInputChange("club", "clubName", e.target.value)}
             onBlur={() => onBlur("club", "clubName")}
             placeholder="Enter club name"
-            className={getError("clubName") ? "input-error" : ""}
+            className={`form-input ${getError("clubName") ? "input-error" : ""}`}
           />
           {getError("clubName") && (
             <span className="error-text">{getError("clubName")}</span>
@@ -33,7 +39,7 @@ export default function CoachClubDetails({
         </div>
 
         <div className="form-group">
-          <label>State Association *</label>
+          <label className="form-label">State Association <span className="required">*</span></label>
           <input
             type="text"
             value={formData.stateAssociation}
@@ -42,7 +48,7 @@ export default function CoachClubDetails({
             }
             onBlur={() => onBlur("club", "stateAssociation")}
             placeholder="Enter state association"
-            className={getError("stateAssociation") ? "input-error" : ""}
+            className={`form-input ${getError("stateAssociation") ? "input-error" : ""}`}
           />
           {getError("stateAssociation") && (
             <span className="error-text">{getError("stateAssociation")}</span>

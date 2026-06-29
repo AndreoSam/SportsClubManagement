@@ -14,11 +14,17 @@ export default function CoachQualification({
 
   return (
     <div className="form-section">
-      <h2 className="section-title">Qualifications</h2>
+      <div className="section-header">
+        <div className="section-icon">🎓</div>
+        <div>
+          <h2 className="section-title">Qualifications</h2>
+          <p className="section-subtitle">Your educational credentials</p>
+        </div>
+      </div>
 
       <div className="form-grid">
         <div className="form-group full-width">
-          <label>Highest Qualification *</label>
+          <label className="form-label">Highest Qualification <span className="required">*</span></label>
           <input
             type="text"
             value={formData.highestQualification}
@@ -27,7 +33,7 @@ export default function CoachQualification({
             }
             onBlur={() => onBlur("qualification", "highestQualification")}
             placeholder="E.g., Bachelor's, Master's, etc."
-            className={getError("highestQualification") ? "input-error" : ""}
+            className={`form-input ${getError("highestQualification") ? "input-error" : ""}`}
           />
           {getError("highestQualification") && (
             <span className="error-text">{getError("highestQualification")}</span>
@@ -35,7 +41,7 @@ export default function CoachQualification({
         </div>
 
         <div className="form-group">
-          <label>Coaching Certification *</label>
+          <label className="form-label">Coaching Certification <span className="required">*</span></label>
           <input
             type="text"
             value={formData.coachingCertification}
@@ -44,7 +50,7 @@ export default function CoachQualification({
             }
             onBlur={() => onBlur("qualification", "coachingCertification")}
             placeholder="E.g., Level 1, Level 2, etc."
-            className={getError("coachingCertification") ? "input-error" : ""}
+            className={`form-input ${getError("coachingCertification") ? "input-error" : ""}`}
           />
           {getError("coachingCertification") && (
             <span className="error-text">{getError("coachingCertification")}</span>
@@ -52,7 +58,7 @@ export default function CoachQualification({
         </div>
 
         <div className="form-group">
-          <label>Coaching License Number *</label>
+          <label className="form-label">Coaching License Number <span className="required">*</span></label>
           <input
             type="text"
             value={formData.licenseNumber}
@@ -61,7 +67,7 @@ export default function CoachQualification({
             }
             onBlur={() => onBlur("qualification", "licenseNumber")}
             placeholder="Enter license number"
-            className={getError("licenseNumber") ? "input-error" : ""}
+            className={`form-input ${getError("licenseNumber") ? "input-error" : ""}`}
           />
           {getError("licenseNumber") && (
             <span className="error-text">{getError("licenseNumber")}</span>

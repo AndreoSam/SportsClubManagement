@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import api from "../services/api";
 import toast from "react-hot-toast";
+import Navbar from "./Navbar";
 import CoachPersonalDetails from "./sections/CoachPersonalDetails";
 import CoachAddressDetails from "./sections/CoachAddressDetails";
 import CoachQualification from "./sections/CoachQualification";
@@ -10,6 +11,7 @@ import CoachExperience from "./sections/CoachExperience";
 import CoachClubDetails from "./sections/CoachClubDetails";
 import CoachDocumentUpload from "./sections/CoachDocumentUpload";
 import PasswordSection from "./sections/PasswordSection";
+import { default as CoachDocumentUploadValidate } from "./sections/CoachDocumentUpload";
 import "./RegistrationForm.css";
 
 export default function CoachRegistrationForm() {
@@ -173,7 +175,7 @@ export default function CoachRegistrationForm() {
     const qualificationErrors = CoachQualification.validate(formData.qualification);
     const experienceErrors = CoachExperience.validate(formData.experience);
     const clubErrors = CoachClubDetails.validate(formData.club);
-    const documentErrors = CoachDocumentUpload.validate(files);
+    const documentErrors = CoachDocumentUploadValidate.validate(files);
     const passErrors = PasswordSection.validate(formData.password, formData.confirmPassword);
 
     const newErrors = {};
@@ -334,14 +336,16 @@ export default function CoachRegistrationForm() {
   };
 
   return (
-    <div className="registration-container">
-      <div className="registration-wrapper">
-        <div className="registration-header">
+    <>
+      <Navbar showBackButton={true} title="Sports Club Management" />
+      <div className="registration-container">
+        <div className="registration-wrapper">
+          <div className="registration-header">
           <div className="header-icon">👨‍🏫</div>
           <div>
             <h1 className="registration-title">Coach Registration</h1>
             <p className="registration-subtitle">
-              Complete all sections to register as a coach
+              Complete all sections to register as a professional coach
             </p>
           </div>
         </div>
@@ -433,5 +437,6 @@ export default function CoachRegistrationForm() {
         </form>
       </div>
     </div>
+    </>
   );
 }

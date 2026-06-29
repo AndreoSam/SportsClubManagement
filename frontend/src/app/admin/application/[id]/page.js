@@ -11,6 +11,8 @@ export default function ApplicationDetailsPage() {
   const params = useParams();
   const [application, setApplication] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -65,21 +67,28 @@ export default function ApplicationDetailsPage() {
     }
   };
 
-  const handleReject = async () => {
-    const reason = prompt("Enter rejection reason:");
-    if (reason) {
-      try {
-        const token = localStorage.getItem("token");
-        await api.patch(
-          `/admin/application/${params.id}/status`,
-          { status: "Rejected", rejectionReason: reason },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        toast.success("Application rejected!");
-        router.push("/admin/dashboard");
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to reject");
-      }
+  const handleRejectClick = () => {
+    setRejectionReason("");
+    setShowRejectModal(true);
+  };
+
+  const handleRejectSubmit = async () => {
+    if (!rejectionReason.trim()) {
+      toast.error("Please enter a rejection reason");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      await api.patch(
+        `/admin/application/${params.id}/status`,
+        { status: "Rejected", rejectionReason: rejectionReason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Application rejected!");
+      router.push("/admin/dashboard");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reject");
     }
   };
 
@@ -158,18 +167,66 @@ export default function ApplicationDetailsPage() {
         <div className="action-buttons">
           {application.status !== "Approved" && (
             <button className="approve-btn" onClick={handleApprove}>
-              ✓ Approve
+              Approve
             </button>
           )}
           {application.status !== "Rejected" && (
-            <button className="reject-btn" onClick={handleReject}>
-              ✕ Reject
+            <button className="reject-btn" onClick={handleRejectClick}>
+              Reject
             </button>
           )}
           <button className="back-link-btn" onClick={() => router.push("/admin/dashboard")}>
             Back to Dashboard
           </button>
         </div>
+
+        {showRejectModal && (
+          <div className="modal-overlay" onClick={() => setShowRejectModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2 className="modal-title">Reject Application</h2>
+                <button
+                  className="modal-close-btn"
+                  onClick={() => setShowRejectModal(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="modal-body">
+                <p className="modal-description">
+                  Please provide a clear reason for rejecting this application. This will be shown to the applicant.
+                </p>
+
+                <div className="form-group">
+                  <label className="form-label">Rejection Reason *</label>
+                  <textarea
+                    className="form-textarea"
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    placeholder="Enter the reason for rejection..."
+                    rows="5"
+                  />
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  className="modal-btn cancel-btn"
+                  onClick={() => setShowRejectModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="modal-btn submit-btn"
+                  onClick={handleRejectSubmit}
+                >
+                  Reject Application
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

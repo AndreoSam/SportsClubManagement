@@ -16,11 +16,17 @@ export default function PasswordSection({
 
   return (
     <div className="form-section">
-      <h2 className="section-title">Create Password</h2>
+      <div className="section-header">
+        <div className="section-icon">🔐</div>
+        <div>
+          <h2 className="section-title">Create Password</h2>
+          <p className="section-subtitle">Secure your account with a strong password</p>
+        </div>
+      </div>
 
       <div className="form-grid">
         <div className="form-group full-width">
-          <label>Password *</label>
+          <label className="form-label">Password <span className="required">*</span></label>
           <div className="password-input-wrapper">
             <input
               type={showPassword ? "text" : "password"}
@@ -28,14 +34,15 @@ export default function PasswordSection({
               onChange={(e) => onPasswordChange(e.target.value)}
               onBlur={() => onBlur("password")}
               placeholder="Enter password (min 8 characters)"
-              className={errors.password ? "input-error" : ""}
+              className={`form-input ${errors.password ? "input-error" : ""}`}
             />
             <button
               type="button"
               className="show-password-btn"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label="Toggle password visibility"
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? "👁️" : "👁️‍🗨️"}
             </button>
           </div>
           {errors.password && (
@@ -47,7 +54,7 @@ export default function PasswordSection({
         </div>
 
         <div className="form-group full-width">
-          <label>Confirm Password *</label>
+          <label className="form-label">Confirm Password <span className="required">*</span></label>
           <div className="password-input-wrapper">
             <input
               type={showConfirmPassword ? "text" : "password"}
@@ -55,14 +62,15 @@ export default function PasswordSection({
               onChange={(e) => onConfirmPasswordChange(e.target.value)}
               onBlur={() => onBlur("confirmPassword")}
               placeholder="Re-enter your password"
-              className={errors.confirmPassword ? "input-error" : ""}
+              className={`form-input ${errors.confirmPassword ? "input-error" : ""}`}
             />
             <button
               type="button"
               className="show-password-btn"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label="Toggle password visibility"
             >
-              {showConfirmPassword ? "🙈" : "👁️"}
+              {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
             </button>
           </div>
           {errors.confirmPassword && (
