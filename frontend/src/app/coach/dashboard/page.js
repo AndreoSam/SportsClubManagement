@@ -4,13 +4,21 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../../services/api";
 import toast from "react-hot-toast";
+import Navbar from "../../../components/Navbar";
 import "./dashboard.css";
 
 export default function CoachDashboard() {
   const router = useRouter();
   const [coach, setCoach] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedSections, setExpandedSections] = useState({
+    personal: true,
+    address: true,
+    qualification: true,
+    experience: true,
+    club: true,
+    documents: true,
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -50,10 +58,7 @@ export default function CoachDashboard() {
   };
 
   const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+    // Sections always expanded
   };
 
   const handleLogout = () => {
@@ -64,22 +69,30 @@ export default function CoachDashboard() {
 
   if (isLoading) {
     return (
-      <div className="coach-dashboard">
-        <div className="loading">Loading profile...</div>
-      </div>
+      <>
+        <Navbar showBackButton={false} title="Sports Club Management" />
+        <div className="coach-dashboard">
+          <div className="loading">Loading profile...</div>
+        </div>
+      </>
     );
   }
 
   if (!coach) {
     return (
-      <div className="coach-dashboard">
-        <div className="no-data">Profile not found</div>
-      </div>
+      <>
+        <Navbar showBackButton={false} title="Sports Club Management" />
+        <div className="coach-dashboard">
+          <div className="no-data">Profile not found</div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="coach-dashboard">
+    <>
+      <Navbar showBackButton={false} title="Sports Club Management" />
+      <div className="coach-dashboard">
       <div className="dashboard-header">
         <div className="header-content">
           <h1 className="dashboard-title">Coach Dashboard</h1>
@@ -162,6 +175,7 @@ export default function CoachDashboard() {
         </button>
       </div>
     </div>
+    </>
   );
 }
 
@@ -191,8 +205,6 @@ function ProfileSection({ title, section, expanded, onToggle, data, fields }) {
 }
 
 function DocumentsSection({ documents }) {
-  const [expanded, setExpanded] = useState(false);
-
   const docFiles = [
     { key: "passportPhoto", label: "Passport Photo" },
     { key: "governmentId", label: "Government ID" },
@@ -202,28 +214,25 @@ function DocumentsSection({ documents }) {
 
   return (
     <div className="profile-section">
-      <div className="section-header" onClick={() => setExpanded(!expanded)}>
+      <div className="section-header">
         <h2 className="section-title">Uploaded Documents</h2>
-        <span className="toggle-icon">{expanded ? "▼" : "▶"}</span>
       </div>
-      {expanded && (
-        <div className="section-content">
-          <div className="documents-list">
-            {docFiles.map((doc) => (
-              <div key={doc.key} className="document-item">
-                <span className="document-label">{doc.label}</span>
-                {documents?.[doc.key] ? (
-                  <a href={documents[doc.key]} target="_blank" rel="noopener noreferrer" className="document-link">
-                    📥 Download
-                  </a>
-                ) : (
-                  <span className="document-empty">Not uploaded</span>
-                )}
-              </div>
-            ))}
-          </div>
+      <div className="section-content">
+        <div className="documents-list">
+          {docFiles.map((doc) => (
+            <div key={doc.key} className="document-item">
+              <span className="document-label">{doc.label}</span>
+              {documents?.[doc.key] ? (
+                <a href={documents[doc.key]} target="_blank" rel="noopener noreferrer" className="document-link">
+                  📥 Download
+                </a>
+              ) : (
+                <span className="document-empty">Not uploaded</span>
+              )}
+            </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

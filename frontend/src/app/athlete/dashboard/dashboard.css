@@ -1,148 +1,152 @@
 .athlete-dashboard {
-  min-height: 100vh;
-  background: #f5f7fa;
+  background: #f8f9fa;
   padding: 20px;
 }
 
 .dashboard-header {
+  max-width: 1400px;
+  margin: 0 auto 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 25px;
+  gap: 20px;
+}
+
+.header-content {
+  flex: 1;
 }
 
 .header-content h1 {
-  margin: 0 0 8px 0;
-  color: #1a202c;
-  font-size: 28px;
-}
-
-.welcome-text {
-  margin: 0;
-  color: #718096;
-  font-size: 14px;
-}
-
-.dashboard-title {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: #1a202c;
   margin: 0;
 }
 
+.welcome-text {
+  font-size: 13px;
+  color: #718096;
+  margin: 4px 0 0 0;
+  font-weight: 400;
+}
+
 .logout-btn {
-  padding: 10px 24px;
-  background: #e53e3e;
+  padding: 8px 20px;
+  background: #ef4444;
   color: white;
   border: none;
   border-radius: 6px;
   font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .logout-btn:hover {
-  background: #c53030;
+  background: #dc2626;
 }
 
 .status-banner {
+  max-width: 1400px;
+  margin: 0 auto 20px;
   background: white;
-  padding: 15px 30px;
-  border-radius: 12px;
-  margin-bottom: 25px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #667eea;
   display: flex;
-  gap: 15px;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  gap: 16px;
 }
 
-.status-badge {
+.status-banner .status-badge {
   display: inline-block;
-  padding: 8px 16px;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border-radius: 16px;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
 }
 
 .status-pending {
-  background: #feebc8;
-  color: #7c2d12;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .status-approved {
-  background: #c6f6d5;
-  color: #22543d;
+  background: #dcfce7;
+  color: #166534;
 }
 
 .status-rejected {
-  background: #fed7d7;
-  color: #742a2a;
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .rejection-reason {
-  margin-top: 15px;
-  padding: 15px;
+  padding: 12px;
   background: #fef2f2;
-  border-left: 4px solid #dc2626;
-  border-radius: 6px;
-  font-size: 14px;
+  border-left: 3px solid #dc2626;
+  border-radius: 4px;
+  font-size: 13px;
   color: #742a2a;
-  line-height: 1.6;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.rejection-reason strong {
+  display: block;
+  margin-bottom: 4px;
 }
 
 .profile-sections {
+  max-width: 1400px;
+  margin: 0 auto 20px;
   display: grid;
-  gap: 15px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
 }
 
 .profile-section {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 30px;
-  cursor: pointer;
-  background: #f7fafc;
+  padding: 14px 16px;
+  background: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
-  transition: background 0.3s ease;
-}
-
-.section-header:hover {
-  background: #edf2f7;
+  user-select: none;
 }
 
 .section-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #2d3748;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a202c;
 }
 
 .toggle-icon {
-  color: #718096;
-  transition: transform 0.3s ease;
+  display: none;
 }
 
 .section-content {
-  padding: 25px 30px;
+  padding: 14px 16px;
 }
 
 .field-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
 .field-item {
@@ -151,33 +155,35 @@
 }
 
 .field-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: #718096;
   text-transform: uppercase;
-  margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
 }
 
 .field-value {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: #2d3748;
+  font-weight: 500;
   word-break: break-word;
 }
 
 .documents-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
 .document-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 15px;
-  background: #f7fafc;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  background: #f8fafc;
   border-radius: 6px;
   border-left: 3px solid #667eea;
 }
@@ -185,19 +191,19 @@
 .document-label {
   font-weight: 600;
   color: #2d3748;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .document-link,
 .document-empty {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .document-link {
   color: #667eea;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .document-link:hover {
@@ -209,19 +215,21 @@
 }
 
 .action-buttons {
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
-  gap: 15px;
+  gap: 12px;
   justify-content: center;
 }
 
 .action-btn {
-  padding: 12px 32px;
+  padding: 10px 24px;
   border: none;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-size: 13px;
+  transition: all 0.2s ease;
 }
 
 .edit-btn {
@@ -231,8 +239,6 @@
 
 .edit-btn:hover {
   background: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .password-btn {
@@ -242,45 +248,54 @@
 
 .password-btn:hover {
   background: #38a169;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
 }
 
 .loading,
 .no-data {
   text-align: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
   color: #718096;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 }
 
-@media (max-width: 768px) {
-  .athlete-dashboard {
-    padding: 15px;
-  }
-
-  .dashboard-header {
-    flex-direction: column;
-    gap: 15px;
-    align-items: flex-start;
-  }
-
-  .header-content h1 {
-    font-size: 24px;
-  }
-
-  .section-header {
-    padding: 15px 20px;
-  }
-
-  .section-content {
-    padding: 20px;
+@media (max-width: 1024px) {
+  .profile-sections {
+    grid-template-columns: 1fr;
   }
 
   .field-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
+  }
+
+  .documents-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .athlete-dashboard {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .header-content h1 {
+    font-size: 20px;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
+
+  .status-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .action-buttons {

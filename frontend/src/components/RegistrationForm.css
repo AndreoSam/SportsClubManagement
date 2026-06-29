@@ -2,7 +2,7 @@
 .registration-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 50%, #faf0ff 100%);
-  padding: 40px 20px;
+  padding: 20px;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
     sans-serif;
@@ -80,6 +80,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+  justify-content: flex-start;
 }
 
 .section-icon {

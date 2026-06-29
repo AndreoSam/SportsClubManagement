@@ -1,11 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import "./navbar.css";
 
 export default function Navbar({ showBackButton = false, title = "Sports Club Management" }) {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <nav className="navbar">
@@ -28,9 +35,11 @@ export default function Navbar({ showBackButton = false, title = "Sports Club Ma
           </div>
 
           <div className="navbar-right">
-            <Link href="/login" className="navbar-link login-link">
-              Login
-            </Link>
+            {!isLoggedIn && (
+              <Link href="/login" className="navbar-link login-link">
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>
