@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import api from "../../../services/api";
 import toast from "react-hot-toast";
 import Navbar from "../../../components/Navbar";
+import { FaDownload } from "react-icons/fa";
 import "./dashboard.css";
 
 export default function AthleteDashboard() {
@@ -93,88 +94,107 @@ export default function AthleteDashboard() {
     <>
       <Navbar showBackButton={false} title="Sports Club Management" />
       <div className="athlete-dashboard">
-      <div className="dashboard-header">
-        <div className="header-content">
-          <h1 className="dashboard-title">Athlete Dashboard</h1>
-          <p className="welcome-text">Welcome, {athlete.personal?.fullName}!</p>
-        </div>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
-
-      <div className="status-banner">
-        <span className={`status-badge status-${athlete.status?.toLowerCase()}`}>
-          {athlete.status}
-        </span>
-        {athlete.status === "Rejected" && athlete.rejectionReason && (
-          <div className="rejection-reason">
-            <strong>Rejection Reason:</strong> {athlete.rejectionReason}
+        <div className="dashboard-header">
+          <div className="header-content">
+            <h1 className="dashboard-title">Athlete Dashboard</h1>
+            <p className="welcome-text">
+              Welcome, {athlete.personal?.fullName}!
+            </p>
           </div>
-        )}
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+
+        <div className="status-banner">
+          <span
+            className={`status-badge status-${athlete.status?.toLowerCase()}`}
+          >
+            {athlete.status}
+          </span>
+          {athlete.status === "Rejected" && athlete.rejectionReason && (
+            <div className="rejection-reason">
+              <strong>Rejection Reason:</strong> {athlete.rejectionReason}
+            </div>
+          )}
+        </div>
+
+        <div className="profile-sections">
+          <ProfileSection
+            title="Personal Details"
+            section="personal"
+            expanded={expandedSections.personal}
+            onToggle={toggleSection}
+            data={athlete.personal}
+            fields={[
+              "fullName",
+              "gender",
+              "dob",
+              "mobile",
+              "email",
+              "bloodGroup",
+            ]}
+          />
+
+          <ProfileSection
+            title="Guardian Details"
+            section="guardian"
+            expanded={expandedSections.guardian}
+            onToggle={toggleSection}
+            data={athlete.guardian}
+            fields={["guardianName", "relation", "mobile", "email"]}
+          />
+
+          <ProfileSection
+            title="Address Details"
+            section="address"
+            expanded={expandedSections.address}
+            onToggle={toggleSection}
+            data={athlete.address}
+            fields={["address", "district", "state", "pinCode"]}
+          />
+
+          <ProfileSection
+            title="Club Details"
+            section="club"
+            expanded={expandedSections.club}
+            onToggle={toggleSection}
+            data={athlete.club}
+            fields={[
+              "clubName",
+              "coachName",
+              "coachMobile",
+              "stateAssociation",
+            ]}
+          />
+
+          <ProfileSection
+            title="Competition Details"
+            section="competition"
+            expanded={expandedSections.competition}
+            onToggle={toggleSection}
+            data={athlete.competition}
+            fields={["competitionName", "ageGroup", "weightCategory", "event"]}
+          />
+
+          <DocumentsSection documents={athlete.documents} />
+        </div>
+
+        <div className="action-buttons">
+          <button
+            className="action-btn edit-btn"
+            onClick={() => router.push("/athlete/edit")}
+          >
+            ✏️ Edit Profile
+          </button>
+          <button
+            className="action-btn password-btn"
+            onClick={() => router.push("/athlete/change-password")}
+          >
+            🔐 Change Password
+          </button>
+        </div>
       </div>
-
-      <div className="profile-sections">
-        <ProfileSection
-          title="Personal Details"
-          section="personal"
-          expanded={expandedSections.personal}
-          onToggle={toggleSection}
-          data={athlete.personal}
-          fields={["fullName", "gender", "dob", "mobile", "email", "bloodGroup"]}
-        />
-
-        <ProfileSection
-          title="Guardian Details"
-          section="guardian"
-          expanded={expandedSections.guardian}
-          onToggle={toggleSection}
-          data={athlete.guardian}
-          fields={["guardianName", "relation", "mobile", "email"]}
-        />
-
-        <ProfileSection
-          title="Address Details"
-          section="address"
-          expanded={expandedSections.address}
-          onToggle={toggleSection}
-          data={athlete.address}
-          fields={["address", "district", "state", "pinCode"]}
-        />
-
-        <ProfileSection
-          title="Club Details"
-          section="club"
-          expanded={expandedSections.club}
-          onToggle={toggleSection}
-          data={athlete.club}
-          fields={["clubName", "coachName", "coachMobile", "stateAssociation"]}
-        />
-
-        <ProfileSection
-          title="Competition Details"
-          section="competition"
-          expanded={expandedSections.competition}
-          onToggle={toggleSection}
-          data={athlete.competition}
-          fields={["competitionName", "ageGroup", "weightCategory", "event"]}
-        />
-
-        <DocumentsSection documents={athlete.documents} />
-      </div>
-
-      <div className="action-buttons">
-        <button className="action-btn edit-btn" onClick={() => router.push("/athlete/edit")}>
-          ✏️ Edit Profile
-        </button>
-        <button
-          className="action-btn password-btn"
-          onClick={() => router.push("/athlete/change-password")}
-        >
-          🔐 Change Password
-        </button>
-      </div>
-    </div>
     </>
   );
 }
@@ -223,8 +243,14 @@ function DocumentsSection({ documents }) {
             <div key={doc.key} className="document-item">
               <span className="document-label">{doc.label}</span>
               {documents?.[doc.key] ? (
-                <a href={documents[doc.key]} target="_blank" rel="noopener noreferrer" className="document-link">
-                  📥 Download
+                <a
+                  href={documents[doc.key]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="document-link"
+                >
+                  <FaDownload />
+                  Download
                 </a>
               ) : (
                 <span className="document-empty">Not uploaded</span>

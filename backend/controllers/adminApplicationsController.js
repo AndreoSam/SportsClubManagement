@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Athlete = require("../models/Athlete");
 const CoachProfile = require("../models/CoachProfile");
 const ExcelJS = require("exceljs");
+const { sendApprovalEmail, sendRejectionEmail } = require("../utils/emailNotifications");
 
 const getApplications = async (req, res) => {
   try {
@@ -191,6 +192,19 @@ const updateApplicationStatus = async (req, res) => {
           reviewedAt: new Date(),
         }
       );
+    }
+
+    // Send status notification email
+    try {
+      if (status === "Approved") {
+        await sendApprovalEmail(user.email, user.name, user.role);
+        console.log("Approval email sent to:", user.email);
+      } else if (status === "Rejected") {
+        await sendRejectionEmail(user.email, user.name, user.role, rejectionReason);
+        console.log("Rejection email sent to:", user.email);
+      }
+    } catch (emailError) {
+      console.error("Failed to send status notification email:", emailError);
     }
 
     return res.json({

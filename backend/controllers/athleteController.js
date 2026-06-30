@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Otp = require("../models/Otp");
 const uploadToImageKit = require("../utils/uploadToImageKit");
 const bcrypt = require("bcryptjs");
+const { sendRegistrationEmail } = require("../utils/emailNotifications");
 
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
@@ -166,6 +167,14 @@ const registerAthlete = async (req, res) => {
     });
 
     console.log("SAVED ATHLETE:", athlete);
+
+    // Send registration confirmation email
+    try {
+      await sendRegistrationEmail(data.personal.email, data.personal.fullName, "Athlete");
+      console.log("Registration email sent to:", data.personal.email);
+    } catch (emailError) {
+      console.error("Failed to send registration email:", emailError);
+    }
 
     return res.status(201).json({
       success: true,

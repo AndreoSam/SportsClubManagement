@@ -242,7 +242,9 @@ const PersonalDetails = ({
               </div>
 
               <div className="otp-help-text">
-                OTP has been sent to <strong>{formData?.email}</strong>
+                <p>
+                  OTP has been sent to <strong>{formData?.email}</strong>
+                </p>
                 <button
                   type="button"
                   className="resend-otp-link"

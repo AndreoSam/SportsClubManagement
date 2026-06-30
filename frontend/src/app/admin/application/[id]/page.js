@@ -57,7 +57,7 @@ export default function ApplicationDetailsPage() {
         await api.patch(
           `/admin/application/${params.id}/status`,
           { status: "Approved" },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         toast.success("Application approved!");
         router.push("/admin/dashboard");
@@ -83,7 +83,7 @@ export default function ApplicationDetailsPage() {
       await api.patch(
         `/admin/application/${params.id}/status`,
         { status: "Rejected", rejectionReason: rejectionReason },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       toast.success("Application rejected!");
       router.push("/admin/dashboard");
@@ -93,11 +93,19 @@ export default function ApplicationDetailsPage() {
   };
 
   if (isLoading) {
-    return <div className="details-container"><div className="loading">Loading...</div></div>;
+    return (
+      <div className="details-container">
+        <div className="loading">Loading...</div>
+      </div>
+    );
   }
 
   if (!application) {
-    return <div className="details-container"><div className="no-data">Application not found</div></div>;
+    return (
+      <div className="details-container">
+        <div className="no-data">Application not found</div>
+      </div>
+    );
   }
 
   const profile = application.profileData;
@@ -130,27 +138,34 @@ export default function ApplicationDetailsPage() {
             </div>
             <div className="info-item">
               <span className="info-label">Role</span>
-              <span className={`role-badge role-${application.role.toLowerCase()}`}>
+              <span
+                className={`role-badge role-${application.role.toLowerCase()}`}
+              >
                 {application.role}
               </span>
             </div>
             <div className="info-item">
               <span className="info-label">Status</span>
-              <span className={`status-badge status-${application.status.toLowerCase()}`}>
+              <span
+                className={`status-badge status-${application.status.toLowerCase()}`}
+              >
                 {application.status}
               </span>
             </div>
             <div className="info-item">
               <span className="info-label">Registered</span>
-              <span className="info-value">{new Date(application.createdAt).toLocaleDateString()}</span>
+              <span className="info-value">
+                {new Date(application.createdAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
-          {application.status === "Rejected" && application.profileData?.rejectionReason && (
-            <div className="rejection-section">
-              <h3>Rejection Reason</h3>
-              <p>{application.profileData.rejectionReason}</p>
-            </div>
-          )}
+          {application.status === "Rejected" &&
+            application.profileData?.rejectionReason && (
+              <div className="rejection-section">
+                <h3>Rejection Reason</h3>
+                <p>{application.profileData.rejectionReason}</p>
+              </div>
+            )}
         </div>
 
         {profile && (
@@ -158,9 +173,7 @@ export default function ApplicationDetailsPage() {
             {application.role === "Athlete" && (
               <AthleteDetails profile={profile} />
             )}
-            {application.role === "Coach" && (
-              <CoachDetails profile={profile} />
-            )}
+            {application.role === "Coach" && <CoachDetails profile={profile} />}
           </>
         )}
 
@@ -175,13 +188,19 @@ export default function ApplicationDetailsPage() {
               Reject
             </button>
           )}
-          <button className="back-link-btn" onClick={() => router.push("/admin/dashboard")}>
+          <button
+            className="back-link-btn"
+            onClick={() => router.push("/admin/dashboard")}
+          >
             Back to Dashboard
           </button>
         </div>
 
         {showRejectModal && (
-          <div className="modal-overlay" onClick={() => setShowRejectModal(false)}>
+          <div
+            className="modal-overlay"
+            onClick={() => setShowRejectModal(false)}
+          >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h2 className="modal-title">Reject Application</h2>
@@ -195,7 +214,8 @@ export default function ApplicationDetailsPage() {
 
               <div className="modal-body">
                 <p className="modal-description">
-                  Please provide a clear reason for rejecting this application. This will be shown to the applicant.
+                  Please provide a clear reason for rejecting this application.
+                  This will be shown to the applicant.
                 </p>
 
                 <div className="form-group">
@@ -284,7 +304,12 @@ function DocumentsCard({ documents }) {
           .map(([key, url]) => (
             <div key={key} className="document-row">
               <span className="document-name">{formatLabel(key)}</span>
-              <a href={url} target="_blank" rel="noopener noreferrer" className="document-link">
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="document-link"
+              >
                 📥 Download
               </a>
             </div>

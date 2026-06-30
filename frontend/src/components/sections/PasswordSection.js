@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 export default function PasswordSection({
   password,
@@ -20,13 +21,17 @@ export default function PasswordSection({
         <div className="section-icon">🔐</div>
         <div>
           <h2 className="section-title">Create Password</h2>
-          <p className="section-subtitle">Secure your account with a strong password</p>
+          <p className="section-subtitle">
+            Secure your account with a strong password
+          </p>
         </div>
       </div>
 
       <div className="form-grid">
         <div className="form-group full-width">
-          <label className="form-label">Password <span className="required">*</span></label>
+          <label className="form-label">
+            Password <span className="required">*</span>
+          </label>
           <div className="password-input-wrapper">
             <input
               type={showPassword ? "text" : "password"}
@@ -42,7 +47,7 @@ export default function PasswordSection({
               onClick={() => setShowPassword(!showPassword)}
               aria-label="Toggle password visibility"
             >
-              {showPassword ? "👁️" : "👁️‍🗨️"}
+              {showPassword ? <IoMdEye /> : <IoMdEyeOff />}
             </button>
           </div>
           {errors.password && (
@@ -54,7 +59,9 @@ export default function PasswordSection({
         </div>
 
         <div className="form-group full-width">
-          <label className="form-label">Confirm Password <span className="required">*</span></label>
+          <label className="form-label">
+            Confirm Password <span className="required">*</span>
+          </label>
           <div className="password-input-wrapper">
             <input
               type={showConfirmPassword ? "text" : "password"}
@@ -70,7 +77,7 @@ export default function PasswordSection({
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               aria-label="Toggle password visibility"
             >
-              {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+              {showConfirmPassword ? <IoMdEye /> : <IoMdEyeOff />}
             </button>
           </div>
           {errors.confirmPassword && (

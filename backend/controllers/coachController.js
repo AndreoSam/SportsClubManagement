@@ -3,6 +3,7 @@ const CoachProfile = require("../models/CoachProfile");
 const Otp = require("../models/Otp");
 const uploadToImageKit = require("../utils/uploadToImageKit");
 const bcrypt = require("bcryptjs");
+const { sendRegistrationEmail } = require("../utils/emailNotifications");
 
 const generateCoachFolder = (fullName, coachId) => {
   const sanitizedName = fullName
@@ -156,6 +157,14 @@ const registerCoach = async (req, res) => {
     await Otp.deleteOne({
       email: data.personal.email,
     });
+
+    // Send registration confirmation email
+    try {
+      await sendRegistrationEmail(data.personal.email, data.personal.fullName, "Coach");
+      console.log("Registration email sent to:", data.personal.email);
+    } catch (emailError) {
+      console.error("Failed to send registration email:", emailError);
+    }
 
     return res.status(201).json({
       success: true,

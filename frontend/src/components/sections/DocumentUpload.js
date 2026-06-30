@@ -1,4 +1,5 @@
 import React from "react";
+import { MdCloudUpload } from "react-icons/md";
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = [
@@ -75,7 +76,9 @@ const DocumentUpload = ({
             style={{ display: "none" }}
           />
           <div className="file-upload-label">
-            <span className="file-upload-icon">📤</span>
+            <span className="file-upload-icon">
+              <MdCloudUpload />
+            </span>
             <span className="file-upload-text">
               {files[field] && !fileErrors[field] ? (
                 <span style={{ color: "#22c55e" }}>✅ {files[field].name}</span>
